@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Filter Selection</title>
+  <script src="popup.mjs"></script>
+  <style>
+    .indent {
+      margin-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Select Filters</h1>
+  <label for="custom">Custom:</label>
+  <input type="checkbox" id="customFilter" />
+  <label for="customFilter">Custom Filter</label>
+
+  <input type="checkbox" id="profanityFilter" />
+  <label for="profanityFilter">Profanity Filter</label>
+
+  <input type="checkbox" id="controversialFilter" />
+  <label for="controversialFilter">Controversial Filter</label>
+
+  <div>
+    <input type="text" id="customWords" placeholder="Add custom words" />
+    <button id="addCustomWordButton">Add</button>
+  </div>
+
+  <button id="applyFiltersButton">Apply Filters</button>
+
+  <script src="popup.mjs"></script>
+</body>
+</html>

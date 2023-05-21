@@ -1,0 +1,28 @@
+{
+    "manifest_version": 3,
+    "name": "Filterino",
+    "version": "0.9",
+    "description": "Filters out unwanted content from Facebook and Twitter.",
+    "permissions": [
+      "activeTab",
+      "storage",
+      "scripting"
+    ],
+    "action":
+    {
+      "default_popup": "src/popup.html"
+    },
+    "host_permissions": [
+      "https://twitter.com/*"
+    ],
+    "background": {
+      "service_worker": "src/background.mjs"
+    },
+    "content_scripts": [
+      {
+        "matches": ["https://twitter.com/*"],
+        "js": ["dist/bundle.js"]
+      }
+    ]
+  }
+  
