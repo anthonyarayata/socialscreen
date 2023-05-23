@@ -1,3 +1,8 @@
+import { chrome } from 'webextension-polyfill';
+import './src/contentscript.mjs';
+import './src/background.mjs';
+import './src/popup.mjs';
+
 // Apply filters when the "Apply Filters" button is clicked
 function applyFilters() {
   // Get the selected filters from the checkboxes and text field
