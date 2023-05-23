@@ -26,9 +26,8 @@
     "util": "^0.12.5",
     "webextension-polyfill": "^0.10.0",
     "webpack": "^5.82.1",
-    "webpack-cli": "^5.1.1"
-  },
-  "devDependencies": {
+    "webpack-cli": "^5.1.1",
+    "webpack-manifest-plugin": "^5.0.0",
     "@babel/core": "^7.21.8",
     "@babel/preset-env": "^7.21.5",
     "babel-loader": "^9.1.2"

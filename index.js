@@ -1,6 +1,5 @@
 import { chrome } from 'webextension-polyfill';
 import './src/contentscript.mjs';
-import './src/background.mjs';
 import './src/popup.mjs';
 
 // Apply filters when the "Apply Filters" button is clicked
@@ -25,15 +24,6 @@ function applyFilters() {
 
 // Initialize the extension
 async function initializeExtension() {
-  // Get the stored filters from Chrome storage
-  const { filters } = await chrome.storage.sync.get(['filters']);
-
-  // Set the checkbox values based on the stored filters
-  document.getElementById('customFilter').checked = filters?.custom || false;
-  document.getElementById('profanityFilter').checked = filters?.profanity || false;
-  document.getElementById('controversialFilter').checked = filters?.controversial || false;
-  document.getElementById('customWords').value = filters?.customWords ? filters.customWords.join(',') : '';
-
   // Attach event listener for the "Apply Filters" button
   document.getElementById('applyFiltersButton').addEventListener('click', applyFilters);
 

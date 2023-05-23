@@ -1,6 +1,16 @@
-// src/background.mjs
+import { chrome } from 'webextension-polyfill';
 
-// Handle web navigation completed events
+// Listen for messages from content scripts
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "tabUpdated" && message.url.includes('https://twitter.com/')) {
+    // Execute your logic or call a function here
+    console.log('Tab updated:', message.tabId, message.url);
+    // You can send a response back to the content script if needed
+    // sendResponse({ response: "Message received" });
+  }
+});
+
+// Listen for web navigation completed events
 chrome.webNavigation.onCompleted.addListener(async (details) => {
   if (details.frameId === 0 && details.url.includes('https://twitter.com/')) {
     // Send a message to the content script indicating tab update
@@ -10,22 +20,4 @@ chrome.webNavigation.onCompleted.addListener(async (details) => {
       url: details.url
     });
   }
-});
-
-// Handle messages from content scripts
-chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
-  if (message.action === "applyFilters") {
-    const { filters } = message;
-    // Store the selected filters in Chrome storage
-    await chrome.storage.sync.set({ filters });
-
-    // Refresh the active tabs if they match the specified domains
-    const tabs = await chrome.tabs.query({});
-    tabs.forEach((tab) => {
-      if (tab.url.includes('facebook.com') || tab.url.includes('twitter.com') || tab.url.includes('instagram.com')) {
-        chrome.tabs.sendMessage(tab.id, { filters });
-        chrome.tabs.reload(tab.id);
-      }
-    });
-  }
-});
+}, { url: [{ hostEquals: 'twitter.com' }] }); // Specify the URL filter for onCompleted event
