@@ -1,7 +1,7 @@
 import Fuse from 'fuse.js';
 
 // Define the JSON file path
-const FILTERS_FILE_PATH = "path/to/filters.json";
+const FILTERS_FILE_PATH = "src/filters/";
 
 // Initialize selectedFilter as an empty array
 let selectedFilter = [];
@@ -68,14 +68,39 @@ if (cachedData) {
   console.log(selectedFilter);
   removeLabelled();
 } else {
-  // Fetch the list of words from the background script
-  chrome.runtime.sendMessage({ action: "fetchFilters" }, (response) => {
-    if (response && response.data) {
-      selectedFilter = response.data.map(word => word.toString());
+  // Listen for messages from the popup
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === 'updateSelectedFilter') {
+      // Set selectedFilter to the selected array from the popup
+      selectedFilter = request.selectedArray;
       localStorage.setItem('selectedFilter', JSON.stringify(selectedFilter));
       removeLabelled();
     }
   });
+}
+
+// Fetch the filter arrays from JSON files
+function fetchFiltersFromJson() {
+  // Assuming the JSON files are named as controversial.json, custom.json, profanity.json
+  const filterFiles = ["controversial.json", "custom.json", "profanity.json"];
+  const filterPromises = filterFiles.map(filterFile => {
+    return fetch(`${FILTERS_FILE_PATH}${filterFile}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Failed to fetch ${filterFile}!`);
+        }
+        return response.json();
+      });
+  });
+
+  Promise.all(filterPromises)
+    .then(filters => {
+      selectedFilter = filters.flat();
+      removeLabelled();
+    })
+    .catch(error => {
+      console.error(error);
+    });
 }
 
 // Create a MutationObserver to run removeLabelled whenever the DOM changes inside the target container

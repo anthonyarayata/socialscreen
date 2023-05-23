@@ -10,6 +10,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
+// Event listener for runtime messages
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'applyFilters') {
+    // Perform logic for applying filters here
+    console.log('Received applyFilters message:', message.filters);
+    // You can send a response back to the sender if needed
+    // sendResponse({ response: "Filters applied" });
+  }
+});
+
 // Listen for web navigation completed events
 chrome.webNavigation.onCompleted.addListener(async (details) => {
   if (details.frameId === 0 && details.url.includes('https://twitter.com/')) {
