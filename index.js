@@ -25,6 +25,7 @@ function applyFilters() {
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach((tab) => {
         if (tab.url.includes('facebook.com') || tab.url.includes('twitter.com') || tab.url.includes('instagram.com')) {
+          chrome.tabs.sendMessage(tab.id, { filters });
           chrome.tabs.reload(tab.id);
         }
       });
