@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "Filterino",
+    "name": "SocialScreen",
     "version": "0.9",
     "description": "Filters out unwanted content from Facebook and Twitter.",
     "permissions": [

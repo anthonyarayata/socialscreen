@@ -1,4 +1,3 @@
-// Import the necessary libraries
 import Fuse from 'fuse.js';
 
 // Define the JSON file path
@@ -85,4 +84,3 @@ observer.observe(document.body, {
   childList: true,
   subtree: true
 });
-
