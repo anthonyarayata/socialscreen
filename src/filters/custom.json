@@ -1,3 +1,5 @@
-[
-    "slave"
-]
+{
+    "filter": [
+    "slave", "loser"
+    ]
+}

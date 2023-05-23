@@ -10,12 +10,26 @@ document.addEventListener("DOMContentLoaded", function() {
   // Initialize the selected filters array
   let selectedFilters = [];
 
+  // Load custom words from storage
+  chrome.storage.local.get("customWords", function(result) {
+    if (result.customWords && Array.isArray(result.customWords)) {
+      selectedFilters.push(...result.customWords);
+    }
+  });
+
   // Event listener for the "Add" button
   addCustomWordButton.addEventListener("click", function() {
     const customWords = customWordsInput.value.trim();
 
     if (customWords !== "") {
+      // Push custom words to the selected filters array
       selectedFilters.push(...customWords.split(","));
+
+      // Save custom words to storage
+      chrome.storage.local.set({ customWords: selectedFilters }, function() {
+        console.log("Custom words updated:", selectedFilters);
+      });
+
       customWordsInput.value = "";
     }
   });

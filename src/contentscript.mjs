@@ -1,59 +1,67 @@
 import Fuse from 'fuse.js';
+import controversialData from '/src/filters/controversial.json';
+import customData from '/src/filters/custom.json';
+import profanityData from '/src/filters/profanity.json';
 
-// Define the JSON file path
-const FILTERS_FILE_PATH = "src/filters/";
-
-// Initialize selectedFilter as an empty array
+// Define the selectedFilter array
 let selectedFilter = [];
 
-// Function to remove labelled elements from the page
-const removeLabelled = () => {
-  // Update Fuse instance with selectedFilter data
-  const fuse = new Fuse(selectedFilter, {
-    shouldSort: true,
-    includeScore: true,
-    threshold: 0.4,
-    location: 0,
-    distance: 100,
-    maxPatternLength: 32,
-    minMatchCharLength: 1,
-    keys: ['name'] // Update with the key(s) in your selectedFilter dataset to search against
-  });
+// Initialize the filter arrays
+let customFilter = [];
+let controversialFilter = [];
+let profanityFilter = [];
 
-  // Loop through all <span> elements in the <main> section
+// Push filter values from customData to customFilter
+if (customData && Array.isArray(customData.filter)) {
+  customFilter.push(...customData.filter);
+}
+
+// Push filter values from controversialData to controversialFilter
+if (controversialData && Array.isArray(controversialData.filter)) {
+  controversialFilter.push(...controversialData.filter);
+}
+
+// Push filter values from profanityData to profanityFilter
+if (profanityData && Array.isArray(profanityData.filter)) {
+  profanityFilter.push(...profanityData.filter);
+}
+
+console.log('Custom Filter:', customFilter);
+console.log('Controversial Filter:', controversialFilter);
+console.log('Profanity Filter:', profanityFilter);
+
+// Load selected filters from local storage
+const cachedSelectedFilter = localStorage.getItem('selectedFilter');
+if (cachedSelectedFilter) {
+  selectedFilter = JSON.parse(cachedSelectedFilter);
+}
+
+console.log('Selected Filter:', selectedFilter);
+
+// Create a Fuse instance for the selected filters
+const fuse = new Fuse(selectedFilter, {
+  shouldSort: true,
+  includeScore: true,
+  threshold: 0.4,
+  location: 0,
+  distance: 100,
+  maxPatternLength: 32,
+  minMatchCharLength: 1,
+  keys: ['filter']
+});
+
+const removeLabelled = () => {
   document.querySelectorAll('main span').forEach(span => {
     const spanText = span.textContent.toLowerCase();
-    const results = fuse.search(spanText);
 
-    if (results.length > 0 && results[0].score > 0.6) {
-      // Hide the related article if a match is found
-      const post = span.closest("article");
+    const searchResults = fuse.search(spanText);
+    if (searchResults.length > 0 && searchResults[0].score > 0.6) {
+      const post = span.closest('article');
       if (post) {
-        let divAbove = post;
-        for (let i = 0; i < 3; i++) {
-          if (divAbove && divAbove.tagName === "DIV") {
-            if (!divAbove.getAttribute("style") || !divAbove.getAttribute("style").includes("display: none")) {
-              divAbove.setAttribute("style", "display: none;");
-            }
-          }
-          divAbove = divAbove && divAbove.previousElementSibling ? divAbove.previousElementSibling : null;
-        }
-      }
-    } else {
-      // Fallback to original function
-      for (let i = 0; i < selectedFilter.length; i++) {
-        if (span.textContent.toLowerCase().includes(selectedFilter[i].toLowerCase())) {
-          const post = span.closest("article");
-          if (post) {
-            let divAbove = post;
-            for (let i = 0; i < 3; i++) {
-              if (divAbove && divAbove.tagName === "DIV") {
-                if (!divAbove.getAttribute("style") || !divAbove.getAttribute("style").includes("display: none")) {
-                  divAbove.setAttribute("style", "display: none;");
-                }
-              }
-              divAbove = divAbove && divAbove.previousElementSibling ? divAbove.previousElementSibling : null;
-            }
+        const divAbove = post.previousElementSibling;
+        if (divAbove && divAbove.tagName === 'DIV') {
+          if (!divAbove.style.display || divAbove.style.display !== 'none') {
+            divAbove.style.display = 'none';
           }
         }
       }
@@ -61,51 +69,53 @@ const removeLabelled = () => {
   });
 };
 
-// Check if the data is already in local storage
-const cachedData = localStorage.getItem('selectedFilter');
-if (cachedData) {
-  selectedFilter = JSON.parse(cachedData);
-  console.log(selectedFilter);
-  removeLabelled();
-} else {
-  // Listen for messages from the popup
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'updateSelectedFilter') {
-      // Set selectedFilter to the selected array from the popup
-      selectedFilter = request.selectedArray;
-      localStorage.setItem('selectedFilter', JSON.stringify(selectedFilter));
-      removeLabelled();
-    }
-  });
+// Check if the filters are already in local storage
+const cachedCustomFilter = localStorage.getItem('customFilter');
+if (cachedCustomFilter) {
+  customFilter = JSON.parse(cachedCustomFilter);
 }
 
-// Fetch the filter arrays from JSON files
-function fetchFiltersFromJson() {
-  // Assuming the JSON files are named as controversial.json, custom.json, profanity.json
-  const filterFiles = ["controversial.json", "custom.json", "profanity.json"];
-  const filterPromises = filterFiles.map(filterFile => {
-    return fetch(`${FILTERS_FILE_PATH}${filterFile}`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`Failed to fetch ${filterFile}!`);
-        }
-        return response.json();
-      });
-  });
-
-  Promise.all(filterPromises)
-    .then(filters => {
-      selectedFilter = filters.flat();
-      removeLabelled();
-    })
-    .catch(error => {
-      console.error(error);
-    });
+const cachedControversialFilter = localStorage.getItem('controversialFilter');
+if (cachedControversialFilter) {
+  controversialFilter = JSON.parse(cachedControversialFilter);
 }
+
+const cachedProfanityFilter = localStorage.getItem('profanityFilter');
+if (cachedProfanityFilter) {
+  profanityFilter = JSON.parse(cachedProfanityFilter);
+}
+
+console.log('Custom Filter:', customFilter);
+console.log('Controversial Filter:', controversialFilter);
+console.log('Profanity Filter:', profanityFilter);
+
+// Save filters to local storage
+localStorage.setItem('customFilter', JSON.stringify(customFilter));
+localStorage.setItem('controversialFilter', JSON.stringify(controversialFilter));
+localStorage.setItem('profanityFilter', JSON.stringify(profanityFilter));
+
+console.log('Custom Filter:', customFilter);
+console.log('Controversial Filter:', controversialFilter);
+console.log('Profanity Filter:', profanityFilter);
 
 // Create a MutationObserver to run removeLabelled whenever the DOM changes inside the target container
 const observer = new MutationObserver(removeLabelled);
 observer.observe(document.body, {
   childList: true,
   subtree: true
+});
+
+// Listen for messages from the popup
+chrome.runtime.onMessage.addListener((request, sender, send) => {
+  if (request.filters && Array.isArray(request.filters)) {
+    selectedFilter = [...customFilter, ...controversialFilter, ...profanityFilter].filter(filter =>
+      request.filters.includes(filter)
+    );
+
+    // Save selected filters to local storage
+    localStorage.setItem('selectedFilter', JSON.stringify(selectedFilter));
+
+    // Update the Fuse instance with the new selected filters
+    fuse.setCollection(selectedFilter);
+  }
 });
