@@ -7,13 +7,14 @@ document.addEventListener("DOMContentLoaded", function() {
   const addCustomWordButton = document.getElementById("addCustomWordButton");
   const applyFiltersButton = document.getElementById("applyFiltersButton");
 
-  // Initialize the selected filters array
-  let selectedFilters = [];
+  // Initialize the applied filters array
+  let appliedFilters = [];
 
-  // Load custom words from storage
-  chrome.storage.local.get("customWords", function(result) {
-    if (result.customWords && Array.isArray(result.customWords)) {
-      selectedFilters.push(...result.customWords);
+  // Load applied filters from storage
+  chrome.storage.local.get("appliedFilters", function(result) {
+    if (result.appliedFilters && Array.isArray(result.appliedFilters)) {
+      appliedFilters = result.appliedFilters;
+      updateCheckboxes();
     }
   });
 
@@ -22,35 +23,23 @@ document.addEventListener("DOMContentLoaded", function() {
     const customWords = customWordsInput.value.trim();
 
     if (customWords !== "") {
-      // Push custom words to the selected filters array
-      selectedFilters.push(...customWords.split(","));
+      // Push custom words to the applied filters array
+      appliedFilters.push(...customWords.split(","));
 
-      // Save custom words to storage
-      chrome.storage.local.set({ customWords: selectedFilters }, function() {
-        console.log("Custom words updated:", selectedFilters);
+      // Save applied filters to storage
+      chrome.storage.local.set({ appliedFilters: appliedFilters }, function() {
+        console.log("Applied filters updated:", appliedFilters);
       });
 
+      // Refresh the page to apply the changes
+      refreshPage();
       customWordsInput.value = "";
     }
   });
 
   // Event listener for the "Apply Filters" button
   applyFiltersButton.addEventListener("click", function() {
-    // Clear the selected filters array
-    selectedFilters = [];
-
-    // Add selected filters to the array
-    if (customCheckbox.checked) {
-      selectedFilters.push("custom");
-    }
-    if (profanityCheckbox.checked) {
-      selectedFilters.push("profanity");
-    }
-    if (controversialCheckbox.checked) {
-      selectedFilters.push("controversial");
-    }
-
-    // Send message to the content script with the selected filters
+    // Send message to the content script with the applied filters
     chrome.tabs.query({}, function(tabs) {
       tabs.forEach(function(tab) {
         if (
@@ -58,10 +47,63 @@ document.addEventListener("DOMContentLoaded", function() {
           tab.url.includes("twitter.com") ||
           tab.url.includes("instagram.com")
         ) {
-          chrome.tabs.sendMessage(tab.id, { filters: selectedFilters });
-          chrome.tabs.reload(tab.id);
+          chrome.tabs.sendMessage(tab.id, { appliedFilters: appliedFilters });
+          refreshPage();
         }
       });
     });
   });
+
+  // Update the checkboxes based on the applied filters
+  function updateCheckboxes() {
+    customCheckbox.checked = appliedFilters.includes("custom");
+    profanityCheckbox.checked = appliedFilters.includes("profanity");
+    controversialCheckbox.checked = appliedFilters.includes("controversial");
+  }
+
+  // Event listener for the checkboxes
+  customCheckbox.addEventListener("change", function() {
+    if (customCheckbox.checked) {
+      appliedFilters.push("custom");
+    } else {
+      const index = appliedFilters.indexOf("custom");
+      if (index !== -1) {
+        appliedFilters.splice(index, 1);
+      }
+    }
+    updateCheckboxes();
+  });
+
+  profanityCheckbox.addEventListener("change", function() {
+    if (profanityCheckbox.checked) {
+      appliedFilters.push("profanity");
+    } else {
+      const index = appliedFilters.indexOf("profanity");
+      if (index !== -1) {
+        appliedFilters.splice(index, 1);
+      }
+    }
+    updateCheckboxes();
+  });
+
+  controversialCheckbox.addEventListener("change", function() {
+    if (controversialCheckbox.checked) {
+      appliedFilters.push("controversial");
+    } else {
+      const index = appliedFilters.indexOf("controversial");
+      if (index !== -1) {
+        appliedFilters.splice(index, 1);
+      }
+    }
+    updateCheckboxes();
+  });
+
+  // Function to refresh the page
+  function refreshPage() {
+    chrome.tabs.query({}, function(tabs) {
+      tabs.forEach(function(tab) {
+        chrome.tabs.reload(tab.id);
+      });
+    });
+  }
 });
