@@ -80,6 +80,14 @@ localStorage.setItem('profanityFilter', JSON.stringify(profanityFilter));
 console.log('Controversial Filter (saved to local storage):', controversialFilter);
 console.log('Profanity Filter (saved to local storage):', profanityFilter);
 
+// Load custom filters from local storage
+const cachedCustomFilters = localStorage.getItem('customFilters');
+if (cachedCustomFilters) {
+  customFilter = JSON.parse(cachedCustomFilters);
+}
+
+console.log('Custom Filter (from local storage):', customFilter);
+
 // Create a MutationObserver to run removeLabelled whenever the DOM changes inside the target container
 const observer = new MutationObserver(removeLabelled);
 observer.observe(document.body, {
@@ -87,18 +95,25 @@ observer.observe(document.body, {
   subtree: true
 });
 
+// Send a message to the background script to retrieve custom filters
+chrome.runtime.sendMessage({ type: 'getCustomFilters' }, response => {
+  if (response.customFilters && Array.isArray(response.customFilters)) {
+    // Update the customFilter array
+    customFilter = [...response.customFilters];
+
+    // Save custom filters to local storage
+    localStorage.setItem('customFilters', JSON.stringify(customFilter));
+  }
+});
+
 // Listen for messages from the popup
-chrome.runtime.onMessage.addListener((request, sender, send) => {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.appliedFilters && Array.isArray(request.appliedFilters)) {
     selectedFilter = [];
 
     if (request.appliedFilters.includes('custom')) {
       // Add custom filters to the selectedFilter array
-      const cachedCustomFilters = localStorage.getItem('customFilters');
-      if (cachedCustomFilters) {
-        const customFilters = JSON.parse(cachedCustomFilters);
-        selectedFilter.push(...customFilters);
-      }
+      selectedFilter.push(...customFilter);
     }
 
     if (request.appliedFilters.includes('profanity')) {
@@ -116,5 +131,17 @@ chrome.runtime.onMessage.addListener((request, sender, send) => {
 
     // Update the Fuse instance with the new selected filters
     fuse.setCollection(selectedFilter);
+  }
+
+  if (request.type === 'addCustomFilter' && request.customWords && typeof request.customWords === 'string') {
+    // Add custom words to the customFilter array
+    const words = request.customWords.split(',').map(word => word.trim());
+    customFilter.push(...words);
+
+    // Save custom filters to local storage
+    localStorage.setItem('customFilters', JSON.stringify(customFilter));
+
+    // Send a message to the background script to update custom filters
+    chrome.runtime.sendMessage({ type: 'updateCustomFilters', customFilters: customFilter });
   }
 });

@@ -7,8 +7,9 @@ document.addEventListener("DOMContentLoaded", function() {
   const addCustomWordButton = document.getElementById("addCustomWordButton");
   const applyFiltersButton = document.getElementById("applyFiltersButton");
 
-  // Initialize the applied filters array
+  // Initialize the applied filters array and added word array
   let appliedFilters = [];
+  let addedWord = [];
 
   // Load applied filters from storage
   chrome.storage.local.get("appliedFilters", function(result) {
@@ -24,11 +25,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (customWords !== "") {
       // Push custom words to the applied filters array
-      appliedFilters.push(...customWords.split(","));
+      addedWord.push(...customWords.split(","));
 
-      // Save applied filters to storage
-      chrome.storage.local.set({ appliedFilters: appliedFilters }, function() {
-        console.log("Applied filters updated:", appliedFilters);
+      // Save custom words to storage
+      chrome.storage.local.set({ addedWord: addedWord }, function() {
+        console.log("Custom words added:", addedWord);
+      });
+
+      // Send a message to the content script to update custom filters
+      chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, { type: "addCustomFilter", customWords: customWords });
       });
 
       // Refresh the page to apply the changes
@@ -39,18 +45,31 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Event listener for the "Apply Filters" button
   applyFiltersButton.addEventListener("click", function() {
+    // Initialize the applied filters array
+    appliedFilters = [];
+
+    if (customCheckbox.checked) {
+      // Add custom filters to the applied filters array
+      appliedFilters.push("custom");
+    }
+    if (profanityCheckbox.checked) {
+      // Add profanity filters to the applied filters array
+      appliedFilters.push("profanity");
+    }
+    if (controversialCheckbox.checked) {
+      // Add controversial filters to the applied filters array
+      appliedFilters.push("controversial");
+    }
+
+    // Save applied filters to storage
+    chrome.storage.local.set({ appliedFilters: appliedFilters }, function () {
+      console.log("Applied filters updated:", appliedFilters);
+    });
+
     // Send message to the content script with the applied filters
-    chrome.tabs.query({}, function(tabs) {
-      tabs.forEach(function(tab) {
-        if (
-          tab.url.includes("facebook.com") ||
-          tab.url.includes("twitter.com") ||
-          tab.url.includes("instagram.com")
-        ) {
-          chrome.tabs.sendMessage(tab.id, { appliedFilters: appliedFilters });
-          refreshPage();
-        }
-      });
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, { type: "applyFilters", appliedFilters: appliedFilters });
+      refreshPage();
     });
   });
 
@@ -61,49 +80,24 @@ document.addEventListener("DOMContentLoaded", function() {
     controversialCheckbox.checked = appliedFilters.includes("controversial");
   }
 
-  // Event listener for the checkboxes
-  customCheckbox.addEventListener("change", function() {
-    if (customCheckbox.checked) {
-      appliedFilters.push("custom");
-    } else {
-      const index = appliedFilters.indexOf("custom");
-      if (index !== -1) {
-        appliedFilters.splice(index, 1);
-      }
-    }
-    updateCheckboxes();
-  });
-
-  profanityCheckbox.addEventListener("change", function() {
-    if (profanityCheckbox.checked) {
-      appliedFilters.push("profanity");
-    } else {
-      const index = appliedFilters.indexOf("profanity");
-      if (index !== -1) {
-        appliedFilters.splice(index, 1);
-      }
-    }
-    updateCheckboxes();
-  });
-
-  controversialCheckbox.addEventListener("change", function() {
-    if (controversialCheckbox.checked) {
-      appliedFilters.push("controversial");
-    } else {
-      const index = appliedFilters.indexOf("controversial");
-      if (index !== -1) {
-        appliedFilters.splice(index, 1);
-      }
-    }
-    updateCheckboxes();
-  });
-
   // Function to refresh the page
+  // Function to refresh Facebook, Twitter, and Instagram tabs
   function refreshPage() {
     chrome.tabs.query({}, function(tabs) {
       tabs.forEach(function(tab) {
-        chrome.tabs.reload(tab.id);
+        if (isSocialMediaTab(tab.url)) {
+          chrome.tabs.reload(tab.id);
+        }
       });
     });
+  }
+
+  // Function to check if a URL belongs to Facebook, Twitter, or Instagram
+  function isSocialMediaTab(url) {
+    return (
+      url.includes("facebook.com") ||
+      url.includes("twitter.com") ||
+      url.includes("instagram.com")
+    );
   }
 });
