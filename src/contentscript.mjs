@@ -28,36 +28,41 @@ if (cachedSelectedFilter) {
 
 console.log('Selected Filter:', selectedFilter);
 
-// Create a Fuse instance for the selected filters
-const fuse = new Fuse(selectedFilter, {
-  shouldSort: true,
-  includeScore: true,
-  threshold: 0.4,
-  location: 0,
-  distance: 100,
-  maxPatternLength: 32,
-  minMatchCharLength: 1,
-  keys: ['filter']
-});
+function removeLabelled() {
+  const options = {
+    includeScore: true,
+    threshold: 0.1
+  };
+  
+  const spanContent = [];
 
-const removeLabelled = () => {
-  document.querySelectorAll('main span').forEach(span => {
-    const spanText = span.textContent.toLowerCase();
+  for (const span of document.querySelectorAll('main span')) {
+    const text = span.textContent.toLowerCase().split(' ');
+    spanContent.push(...text);
+  }
 
-    const searchResults = fuse.search(spanText);
-    if (searchResults.length > 0 && searchResults[0].score > 0.6) {
-      const post = span.closest('article');
-      if (post) {
-        const divAbove = post.previousElementSibling;
-        if (divAbove && divAbove.tagName === 'DIV') {
-          if (!divAbove.style.display || divAbove.style.display !== 'none') {
-            divAbove.style.display = 'none';
+  const fuse = new Fuse(spanContent, options);
+
+  for (const filter of selectedFilter) {
+    const results = fuse.search(filter);
+    for (const result of results) {
+      for (const toRemove of document.querySelectorAll('main span')) {
+        if (toRemove.textContent.includes(result.item)) {
+          const post = toRemove.closest('article');
+          if (post && post.style.display !== 'none') {
+            const thirdParentDiv = post.parentElement?.parentElement?.parentElement; 
+            if (thirdParentDiv) {
+              thirdParentDiv.setAttribute('style', 'display: none !important');
+              console.log(`Removed post: ${toRemove.textContent}\n${result.item} (${result.score})`);
+            }
           }
         }
       }
     }
-  });
-};
+  }
+}
+
+removeLabelled();
 
 // Check if the filters are already in local storage
 const cachedControversialFilter = localStorage.getItem('controversialFilter');
@@ -131,6 +136,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     // Update the Fuse instance with the new selected filters
     fuse.setCollection(selectedFilter);
+
+    // Run removeLabelled to apply the updated filters immediately
+    removeLabelled();
   }
 
   if (request.type === 'addCustomFilter' && request.customWords && typeof request.customWords === 'string') {
@@ -144,4 +152,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // Send a message to the background script to update custom filters
     chrome.runtime.sendMessage({ type: 'updateCustomFilters', customFilters: customFilter });
   }
+
+  // Run removeLabelled every 3 seconds
+  setInterval(removeLabelled, 3000);
 });
+
