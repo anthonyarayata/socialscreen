@@ -34,31 +34,37 @@ function removeLabelled() {
     threshold: 0.1
   };
   
-  const spanContent = [];
+  function twitterFilter(){
+    const spanContent = [];
 
-  for (const span of document.querySelectorAll('main span')) {
-    const text = span.textContent.toLowerCase().split(' ');
-    spanContent.push(...text);
-  }
+    for (const span of document.querySelectorAll('main span')) {
+      const text = span.textContent.toLowerCase().split(' ');
+      spanContent.push(...text);
+    }
 
-  const fuse = new Fuse(spanContent, options);
+    const fuse = new Fuse(spanContent, options);
 
-  for (const filter of selectedFilter) {
-    const results = fuse.search(filter);
-    for (const result of results) {
-      for (const toRemove of document.querySelectorAll('main span')) {
-        if (toRemove.textContent.includes(result.item)) {
-          const post = toRemove.closest('article');
-          if (post && post.style.display !== 'none') {
-            const thirdParentDiv = post.parentElement?.parentElement?.parentElement; 
-            if (thirdParentDiv) {
-              thirdParentDiv.setAttribute('style', 'display: none !important');
-              console.log(`Removed post: ${toRemove.textContent}\n${result.item} (${result.score})`);
+    for (const filter of selectedFilter) {
+      const results = fuse.search(filter);
+      for (const result of results) {
+        for (const toRemove of document.querySelectorAll('main span')) {
+          if (toRemove.textContent.includes(result.item)) {
+            const post = toRemove.closest('article');
+            if (post && post.style.display !== 'none') {
+              const thirdParentDiv = post.parentElement?.parentElement?.parentElement; 
+              if (thirdParentDiv) {
+                thirdParentDiv.setAttribute('style', 'display: none !important');
+                console.log(`Removed post: ${toRemove.textContent}\n${result.item} (${result.score})`);
+              }
             }
           }
         }
       }
     }
+  }
+
+  if(window.location.hostname === 'twitter.com'){
+    twitterFilter();
   }
 }
 
