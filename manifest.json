@@ -1,30 +1,34 @@
 {
-    "manifest_version": 3,
-    "name": "SocialScreen",
-    "version": "0.9",
-    "description": "Filters out unwanted content from Facebook and Twitter.",
-    "permissions": [
-      "activeTab",
-      "storage",
-      "scripting",
-      "webNavigation",
-      "tabs"
-    ],
-    "action":
+  "manifest_version": 3,
+  "name": "SocialScreen",
+  "version": "0.9",
+  "description": "Filters out unwanted content from Facebook and Twitter.",
+  "permissions": [
+    "storage",
+    "scripting",
+    "webNavigation",
+    "tabs",
+    "activeTab"
+  ],
+  "action": {
+    "default_popup": "src/popup.html"
+  },
+  "host_permissions": [
+    "https://twitter.com/*",
+    "https://www.facebook.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background.mjs",
+    "type": "module"
+  },
+  "content_scripts": [
     {
-      "default_popup": "src/popup.html"
-    },
-    "host_permissions": [
-      "https://twitter.com/*"
-    ],
-    "background": {
-      "service_worker": "src/background.mjs"
-    },
-    "content_scripts": [
-      {
-        "matches": ["https://twitter.com/*"],
-        "js": ["dist/bundle.js"]
-      }
-    ]
+      "matches": ["https://twitter.com/*", "https://www.facebook.com/*"],
+      "js": ["dist/bundle.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "src/popup.html"
   }
-  
+}

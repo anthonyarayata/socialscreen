@@ -2,7 +2,7 @@ import { chrome } from 'webextension-polyfill';
 
 // Listen for messages from content scripts
 chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {
-  if (message.action === "tabUpdated" && message.url.includes('https://twitter.com/')) {
+  if (message.action === "tabUpdated" && (message.url.includes('https://twitter.com/') || message.url.includes('https://www.facebook.com/'))) {
     // Execute your logic or call a function here
     console.log('Tab updated:', message.tabId, message.url);
     // You can send a response back to the content script if needed
@@ -34,7 +34,7 @@ chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => 
 
 // Listen for web navigation completed events
 chrome.webNavigation.onCompleted.addListener(async (details) => {
-  if (details.frameId === 0 && details.url.includes('https://twitter.com/')) {
+  if (details.frameId === 0 && (details.url.includes('https://twitter.com/') || details.url.includes('https://www.facebook.com/'))) {
     // Send a message to the content script indicating tab update
     chrome.tabs.sendMessage(details.tabId, {
       action: "tabUpdated",
@@ -42,4 +42,4 @@ chrome.webNavigation.onCompleted.addListener(async (details) => {
       url: details.url
     });
   }
-}, { url: [{ hostEquals: 'twitter.com' }] }); // Specify the URL filter for onCompleted event
+}, { url: [{ hostEquals: 'twitter.com' }, { hostEquals: 'www.facebook.com' }] }); // Specify the URL filter for onCompleted event
