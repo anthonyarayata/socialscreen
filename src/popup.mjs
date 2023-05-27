@@ -53,10 +53,8 @@ document.addEventListener("DOMContentLoaded", function() {
       chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, { type: "addCustomFilter", customWords: customWords });
       });
-
-      // Refresh the page to apply the changes
-      refreshPage();
       customWordsInput.value = "";
+      delayedRefresh();
     }
   });
 
@@ -65,8 +63,11 @@ document.addEventListener("DOMContentLoaded", function() {
     // Initialize the applied filters array
     appliedFilters = [];
 
+    // Empty selectedFilter array in chrome storage
+    chrome.storage.local.set({ selectedFilter: [] });
+
     if (customCheckbox.checked) {
-      // Add custom filters to the applied filters array
+      // Add custom filters to the applied filters arrays
       appliedFilters.push("custom");
     }
     if (profanityCheckbox.checked) {
@@ -86,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Send message to the content script with the applied filters
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
       chrome.tabs.sendMessage(tabs[0].id, { type: "applyFilters", appliedFilters: appliedFilters });
-      refreshPage();
+      delayedRefresh();
     });
   });
 
@@ -156,6 +157,10 @@ function displayCustomFilter(popupCustomFilter) {
         }
       });
     });
+  }
+
+  function delayedRefresh() {
+    setTimeout(refreshPage, 1000);
   }
 
   // Function to check if a URL belongs to Facebook, Twitter, or Instagram

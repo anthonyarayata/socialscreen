@@ -153,6 +153,7 @@ chrome.runtime.sendMessage({ type: 'getCustomFilters' }, response => {
 // Listen for messages from the popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.appliedFilters && Array.isArray(request.appliedFilters)) {
+    chrome.storage.local.set({ selectedFilter: []})
     selectedFilter = [];
 
     if (request.appliedFilters.includes('custom')) {
@@ -184,11 +185,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const words = request.customWords.split(',').map(word => word.trim());
     customFilter.push(...words);
 
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {  
-      if (request.appliedFilters.includes('custom')) {
+    // Check if appliedFilters contains 'custom' 
+    chrome.storage.local.get("appliedFilters", function(result){
+      if(result.appliedFilters.includes('custom')){
         // Add custom filters to the selectedFilter array
-        selectedFilter.push(...customFilter);
-        // Save selected filters to Chrome storage
+        selectedFilter.push(...words);
         chrome.storage.local.set({ selectedFilter: selectedFilter });
       }
     });
@@ -209,6 +210,3 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // Update the selectedFilter array when removeCustomWordFilter is called
   
 });
-
-// Run removeLabelled every 3 seconds
-setInterval(removeLabelled, 3000);
