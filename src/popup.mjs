@@ -6,10 +6,20 @@ document.addEventListener("DOMContentLoaded", function() {
   const customWordsInput = document.getElementById("customWords");
   const addCustomWordButton = document.getElementById("addCustomWordButton");
   const applyFiltersButton = document.getElementById("applyFiltersButton");
+  const showCustomFilterButton = document.getElementById("showCustomFilterButton"); // Added button
+  const customFilterContainer = document.getElementById("customFilterContainer"); // Container for displaying custom filter
 
   // Initialize the applied filters array and added word array
   let appliedFilters = [];
-  let addedWord = [];
+  let addedWords = [];
+  let popupCustomFilter = [];
+
+  // Load custom filters from storage
+  chrome.storage.local.get("customFilters", function(result) {
+    if (result.customFilters && Array.isArray(result.customFilters)) {
+      popupCustomFilter = result.customFilters;
+    }
+  });
 
   // Load applied filters from storage
   chrome.storage.local.get("appliedFilters", function(result) {
@@ -19,17 +29,24 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
 
+  // Load added words from storage
+  chrome.storage.local.get("addedWords", function(result) {
+    if (result.addedWords && Array.isArray(result.addedWords)) {
+      addedWords = result.addedWords;
+    }
+  });
+
   // Event listener for the "Add" button
   addCustomWordButton.addEventListener("click", function() {
     const customWords = customWordsInput.value.trim();
 
     if (customWords !== "") {
-      // Push custom words to the applied filters array
-      addedWord.push(...customWords.split(","));
+      // Push custom words to the added words array
+      addedWords.push(...customWords.split(","));
 
-      // Save custom words to storage
-      chrome.storage.local.set({ addedWord: addedWord }, function() {
-        console.log("Custom words added:", addedWord);
+      // Save added words to storage
+      chrome.storage.local.set({ addedWords: addedWords }, function() {
+        console.log("Added words:", addedWords);
       });
 
       // Send a message to the content script to update custom filters
@@ -73,11 +90,33 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   });
 
+  // Event listener for the "Show Custom Filter" button
+  showCustomFilterButton.addEventListener("click", function() {
+    // Display the added words as the custom filter
+    displayCustomFilter(popupCustomFilter);
+  });
+
   // Update the checkboxes based on the applied filters
   function updateCheckboxes() {
     customCheckbox.checked = appliedFilters.includes("custom");
     profanityCheckbox.checked = appliedFilters.includes("profanity");
     controversialCheckbox.checked = appliedFilters.includes("controversial");
+  }
+
+  // Display the custom filter in the popup
+  function displayCustomFilter(popUpCustomFilter) {
+    let html = "<h2>Custom Filter List</h2>";
+    if (popUpCustomFilter.length > 0) {
+      html += "<ul>";
+      popUpCustomFilter.forEach(function(word) {
+        html += "<li>" + word + "</li>";
+      });
+      html += "</ul>";
+    } else {
+      html += "<p>No custom filter selected.</p>";
+    }
+    customFilterContainer.innerHTML = html;
+    customFilterContainer.style.display = "block"; // Show the custom filter container
   }
 
   // Function to refresh the page

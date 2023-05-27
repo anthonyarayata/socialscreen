@@ -27,8 +27,5 @@
       "js": ["dist/bundle.js"],
       "run_at": "document_idle"
     }
-  ],
-  "action": {
-    "default_popup": "src/popup.html"
-  }
+  ]
 }
