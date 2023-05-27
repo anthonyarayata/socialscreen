@@ -108,21 +108,43 @@ document.addEventListener("DOMContentLoaded", function() {
     controversialCheckbox.checked = appliedFilters.includes("controversial");
   }
 
-  // Display the custom filter in the popup
-  function displayCustomFilter(popUpCustomFilter) {
-    let html = "<h2>Custom Filter List</h2>";
-    if (popUpCustomFilter.length > 0) {
-      html += "<ul>";
-      popUpCustomFilter.forEach(function(word) {
-        html += "<li>" + word + "</li>";
-      });
-      html += "</ul>";
-    } else {
-      html += "<p>No custom filter selected.</p>";
-    }
-    customFilterContainer.innerHTML = html;
-    customFilterContainer.style.display = "block"; // Show the custom filter container
+// Display the custom filter in the popup
+function displayCustomFilter(popupCustomFilter) {
+  let html = "<h2>Custom Filter List</h2>";
+  if (popupCustomFilter.length > 0) {
+    html += "<ul>";
+    popupCustomFilter.forEach(function(word) {
+      html += "<li>" + word + " <button class='removeWordButton' data-word='" + word + "'>x</button></li>";
+    });
+    html += "</ul>";
+  } else {
+    html += "<p>No custom filter selected.</p>";
   }
+  customFilterContainer.innerHTML = html;
+  customFilterContainer.style.display = "block"; // Show the custom filter container
+
+  // Function to remove a word from the custom filter
+  function removeCustomFilterWord(word) {
+    const index = popupCustomFilter.indexOf(word);
+    if (index !== -1) {
+      popupCustomFilter.splice(index, 1);
+      // Save updated custom filter to storage
+      chrome.storage.local.set({ customFilters: popupCustomFilter }, function() {
+        console.log("Custom filter updated:", popupCustomFilter);
+      });
+      // Refresh the displayed custom filter
+      displayCustomFilter(popupCustomFilter);
+    }
+  }
+  // Add event listeners to the remove word buttons
+  const removeWordButtons = document.getElementsByClassName("removeWordButton");
+  for (let i = 0; i < removeWordButtons.length; i++) {
+    removeWordButtons[i].addEventListener("click", function(event) {
+      const word = event.target.dataset.word;
+      removeCustomFilterWord(word);
+    });
+  }
+}
 
   // Function to refresh the page
   // Function to refresh Facebook, Twitter, and Instagram tabs

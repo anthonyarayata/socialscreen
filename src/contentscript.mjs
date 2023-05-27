@@ -178,11 +178,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // Run removeLabelled to apply the updated filters immediately
     removeLabelled();
   }
-
+  // Update the selectedFilter array if the 'custom' filter is applied
   if (request.type === 'addCustomFilter' && request.customWords && typeof request.customWords === 'string') {
     // Add custom words to the customFilter array
     const words = request.customWords.split(',').map(word => word.trim());
     customFilter.push(...words);
+
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {  
+      if (request.appliedFilters.includes('custom')) {
+        // Add custom filters to the selectedFilter array
+        selectedFilter.push(...customFilter);
+        // Save selected filters to Chrome storage
+        chrome.storage.local.set({ selectedFilter: selectedFilter });
+      }
+    });
 
     // Save custom filters to Chrome storage
     chrome.storage.local.set({ customFilters: customFilter });
@@ -192,17 +201,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // Send a message to the background script to update custom filters
     chrome.runtime.sendMessage({ type: 'updateCustomFilters', customFilters: customFilter });
 
-    // Update the selectedFilter array if the 'custom' filter is applied
-    if (request.appliedFilters.includes('custom')) {
-      selectedFilter = selectedFilter.filter(filter => filter !== 'custom');
-      selectedFilter.push(...words);
-    }
-
     // Send a message to the content script with the updated selected filters
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
       chrome.tabs.sendMessage(tabs[0].id, { type: "applyFilters", appliedFilters: selectedFilter });
     });
   }
+  // Update the selectedFilter array when removeCustomWordFilter is called
+  
 });
 
 // Run removeLabelled every 3 seconds
