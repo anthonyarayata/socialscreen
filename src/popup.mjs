@@ -92,8 +92,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Event listener for the "Show Custom Filter" button
   showCustomFilterButton.addEventListener("click", function() {
-    // Display the added words as the custom filter
-    displayCustomFilter(popupCustomFilter);
+    if (customFilterContainer.style.display === "none") {
+      // Display the added words as the custom filter
+      displayCustomFilter(popupCustomFilter);
+      customFilterContainer.style.display = "block"; // Show the custom filter container
+    } else {
+      customFilterContainer.style.display = "none"; // Hide the custom filter container
+    }
   });
 
   // Update the checkboxes based on the applied filters
