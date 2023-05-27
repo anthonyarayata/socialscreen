@@ -133,8 +133,12 @@ function displayCustomFilter(popupCustomFilter) {
       chrome.storage.local.set({ customFilters: popupCustomFilter }, function() {
         console.log("Custom filter updated:", popupCustomFilter);
       });
+      if(customCheckbox.checked) {
+         chrome.storage.local.set({ selectedFilter: popupCustomFilter });
+      }
       // Refresh the displayed custom filter
       displayCustomFilter(popupCustomFilter);
+      delayedRefresh();
     }
   }
   // Add event listeners to the remove word buttons
