@@ -4,6 +4,7 @@ import profanityData from '/src/filters/profanity.json';
 
 // Define the selectedFilter array
 let selectedFilter = [];
+let splitselectedFilter = [];
 
 // Initialize the filter arrays
 let controversialFilter = [];
@@ -43,7 +44,12 @@ function removeLabelled() {
 
     const fuse = new Fuse(spanContent, options);
 
-    for (const filter of selectedFilter) {
+    for (let i = 0; i < selectedFilter.length; i++) {
+      const words = selectedFilter[i].split(" ");
+      splitselectedFilter.push(...words);
+    }
+
+    for (const filter of splitselectedFilter) {
       const results = fuse.search(filter);
       for (const result of results) {
         for (const toRemove of document.querySelectorAll('main span')) {
@@ -75,7 +81,12 @@ function removeLabelled() {
 
     const fuse = new Fuse(fbTextContent, options);
 
-    for (const filter of selectedFilter) {
+    for (let i = 0; i < selectedFilter.length; i++) {
+      const words = selectedFilter[i].split(" ");
+      splitselectedFilter.push(...words);
+    }
+
+    for (const filter of splitselectedFilter) {
       const results = fuse.search(filter);
       for (const result of results) {
         for (const toRemove of targetDivs){
