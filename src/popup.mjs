@@ -54,7 +54,6 @@ document.addEventListener("DOMContentLoaded", function() {
         chrome.tabs.sendMessage(tabs[0].id, { type: "addCustomFilter", customWords: customWords });
       });
       customWordsInput.value = "";
-      delayedRefresh();
     }
   });
 
@@ -87,7 +86,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // Send message to the content script with the applied filters
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
       chrome.tabs.sendMessage(tabs[0].id, { type: "applyFilters", appliedFilters: appliedFilters });
-      delayedRefresh();
     });
   });
 

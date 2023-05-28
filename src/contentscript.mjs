@@ -39,9 +39,10 @@ function removeLabelled() {
 
     for (const span of document.querySelectorAll('main span')) {
       const text = span.textContent.toLowerCase().split(' ');
-      spanContent.push(...text);
+      const uniqueText = text.filter((item) => !spanContent.includes(item));
+      spanContent.push(...uniqueText);
     }
-
+    
     const fuse = new Fuse(spanContent, options);
 
     for (let i = 0; i < selectedFilter.length; i++) {
@@ -54,13 +55,11 @@ function removeLabelled() {
       for (const result of results) {
         for (const toRemove of document.querySelectorAll('main span')) {
           if (toRemove.textContent.toLowerCase().includes(result.item)) {
-            const post = toRemove.closest('article');
-            if (post && post.style.display !== 'none') {
-              const thirdParentDiv = post.parentElement?.parentElement?.parentElement;
-              if (thirdParentDiv) {
-                thirdParentDiv.setAttribute('style', 'display: none !important');
-                console.log(`Removed post: ${toRemove.textContent}\n${result.item} (${result.score})`);
-              }
+            const post = toRemove.closest("div[class*='css-1dbjc4n r-1igl3o0 r-qklmqi r-1adg3ll r-1ny4l3l']");
+            const postContainer = post.parentElement;
+            if(postContainer && postContainer.style.display !== "none"){
+              postContainer.setAttribute("style", "display: none !important;")
+              console.log(`Removed post: ${toRemove.textContent}\n${result.item} (${result.score})`);
             }
           }
         }
@@ -100,7 +99,6 @@ function removeLabelled() {
         }
       }
     }
-    console.log(fbTextContent);
   }
 
   if (window.location.hostname === 'twitter.com') {
