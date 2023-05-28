@@ -33,6 +33,7 @@ function removeLabelled() {
   };
 
   function twitterFilter() {
+
     const spanContent = [];
 
     for (const span of document.querySelectorAll('main span')) {
@@ -62,40 +63,33 @@ function removeLabelled() {
   }
 
   function facebookFilter() {
-    const divContent = [];
 
-    for (const div of document.querySelectorAll('span div')) {
+    const fbTextContent = [];
+    const targetDivs = document.querySelectorAll("div[class*='xdj266r x11i5rnm xat24cr x1mh8g0r x1vvkbs']");
+    
+    for (const div of targetDivs) {
       const text = div.textContent.toLowerCase().split(' ');
-      const computedStyle = window.getComputedStyle(div);
-      const textAlign = computedStyle.getPropertyValue('text-align');
-
-      if (textAlign === 'start') {
-        const uniqueText = text.filter((item) => !divContent.includes(item));
-        divContent.push(...uniqueText);
-      }
+      const uniqueText = text.filter((item) => !fbTextContent.includes(item));
+      fbTextContent.push(...uniqueText);
     }
 
-    console.log(divContent);
-
-    const fuse = new Fuse(divContent, options);
+    const fuse = new Fuse(fbTextContent, options);
 
     for (const filter of selectedFilter) {
       const results = fuse.search(filter);
       for (const result of results) {
-        for (const toRemove of document.querySelectorAll('span div')) {
-          if (toRemove.textContent.toLowerCase().includes(result.item)) {
-            const textContainer = toRemove.closest('span');
-            if (textContainer && textContainer.style.display !== 'none') {
-              const post = textContainer.parentNode; // need a way to find the parent of the parent of the parent
-              if (post) {
-                post.setAttribute('style', 'display: none !important');
-                console.log(`Removed post: ${toRemove.textContent}\n${result.item} (${result.score})`);
-              }
+        for (const toRemove of targetDivs){
+          if(toRemove.textContent.toLowerCase().includes(result.item)){
+          const postContainer = toRemove.closest("div[class*='x9f619 x1n2onr6 x1ja2u2z x2bj2ny x1qpq9i9 xdney7k xu5ydu1 xt3gfkd xh8yej3 x6ikm8r x10wlt62 xquyuld']")
+            if (postContainer && postContainer.style.display !== 'none') {
+              postContainer.setAttribute('style', 'display: none !important');
+              console.log(`Removed post: ${toRemove.textContent}\n${result.item} (${result.score})`);
             }
           }
         }
       }
     }
+    console.log(fbTextContent);
   }
 
   if (window.location.hostname === 'twitter.com') {
@@ -207,6 +201,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       chrome.tabs.sendMessage(tabs[0].id, { type: "applyFilters", appliedFilters: selectedFilter });
     });
   }
-  // Update the selectedFilter array when removeCustomWordFilter is called
-  
+  // Run the script removedLabelled every 3 seconds
+  setInterval(removeLabelled, 3000);
 });

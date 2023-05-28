@@ -138,7 +138,6 @@ function displayCustomFilter(popupCustomFilter) {
       }
       // Refresh the displayed custom filter
       displayCustomFilter(popupCustomFilter);
-      delayedRefresh();
     }
   }
   // Add event listeners to the remove word buttons
