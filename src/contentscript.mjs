@@ -33,18 +33,22 @@ function removeLabelled() {
     threshold: 0.1
   };
 
+
+  // This function is designed specifically for Twitter
   function twitterFilter() {
 
-    const spanContent = [];
+    const spanContent = []; // Array to hold the text content of twitter which are usually in spans
+    const commentText = document.querySelectorAll("div[class*='css-901oao r-1nao33i r-37j5jr r-a023e6 r-16dba41 r-rjixqe r-bcqeeo r-bnwqim r-qvutc0'] span[class*='css-901oao css-16my406 r-poiln3 r-bcqeeo r-qvutc0']")
 
-    for (const span of document.querySelectorAll('main span')) {
-      const text = span.textContent.toLowerCase().split(' ');
-      const uniqueText = text.filter((item) => !spanContent.includes(item));
-      spanContent.push(...uniqueText);
+    for (const span of document.querySelectorAll('main span')) { // Grabs all the spans in the main section of the page
+      const text = span.textContent.toLowerCase().split(' '); // Splits the text content of each span into an array of words
+      const uniqueText = text.filter((item) => !spanContent.includes(item)); // Filters out duplicate words
+      spanContent.push(...uniqueText); // Pushes the unique words to the spanContent array
     }
     
     const fuse = new Fuse(spanContent, options);
 
+    // Split the selectedFilter array into individual words (Fuse can only search single word strings)
     for (let i = 0; i < selectedFilter.length; i++) {
       const words = selectedFilter[i].split(" ");
       splitselectedFilter.push(...words);
@@ -53,26 +57,41 @@ function removeLabelled() {
     for (const filter of splitselectedFilter) {
       const results = fuse.search(filter);
       for (const result of results) {
-        for (const toRemove of document.querySelectorAll('main span')) {
-          if (toRemove.textContent.toLowerCase().includes(result.item)) {
-            const post = toRemove.closest("div[class*='css-1dbjc4n r-1igl3o0 r-qklmqi r-1adg3ll r-1ny4l3l']");
-            const postContainer = post.parentElement;
-            if(postContainer && postContainer.style.display !== "none"){
-              postContainer.setAttribute("style", "display: none !important;")
-              console.log(`Removed post: ${toRemove.textContent}\n${result.item} (${result.score})`);
+        for (const toRemoveTweet of document.querySelectorAll("div[class*='css-901oao r-1nao33i r-37j5jr r-a023e6 r-16dba41 r-rjixqe r-bcqeeo r-bnwqim r-qvutc0'] span[class*='css-901oao css-16my406 r-poiln3 r-bcqeeo r-qvutc0']")) {
+          if (toRemoveTweet.textContent.toLowerCase().includes(result.item)) {
+            const postContainer = toRemoveTweet.closest("div[class*='css-1dbjc4n r-1igl3o0 r-qklmqi r-1adg3ll r-1ny4l3l']"); // Finds the closest div with the class that holds the text
+            if(postContainer && postContainer.style.display !== "none"){ // Checks if the post is already hidden
+              postContainer.setAttribute("style", "display: none !important;") // Hides the post
+              console.log(`Removed post: ${toRemoveTweet.textContent}\n${result.item} (${result.score})`);
             }
           }
         }
       }
     }
+
+    for (const filter of splitselectedFilter) {
+      const results = fuse.search(filter);
+      for (const result of results) {
+        for (const toRemoveComment of commentText) {
+          const commentContainer = toRemoveComment.closest("div[class*='css-1dbjc4n r-1adg3ll r-1ny4l3l']");
+          if(commentContainer && commentContainer.style.display !== "none"){
+            commentContainer.setAttribute("style", "display: none !important;");
+            console.log(`Removed comment: ${toRemoveComment.textContent}\n${result.item} (${result.score})`);
+          }
+        }
+      }
+    }
+
   }
 
   function facebookFilter() {
 
-    const fbTextContent = [];
-    const targetDivs = document.querySelectorAll("div[class*='xdj266r x11i5rnm xat24cr x1mh8g0r x1vvkbs']");
+    const fbTextContent = []; // Array to hold the text content of facebook which are usually in divs
+    const targetTexts = document.querySelectorAll("div[class*='xdj266r x11i5rnm xat24cr x1mh8g0r x1vvkbs']"); // This class specifically holds the text content of facebook posts (was targetDivs)
+    const postText = document.querySelectorAll("div[class*='x11i5rnm xat24cr x1mh8g0r x1vvkbs xtlvy1s x126k92a x11i5rnm xat24cr x1mh8g0r x1vvkbs xtlvy1s x126k92a']");
+    const commentText = document.querySelectorAll("div[class='xdj266r x11i5rnm xat24cr x1mh8g0r x1vvkbs']");
     
-    for (const div of targetDivs) {
+    for (const div of targetTexts) {
       const text = div.textContent.toLowerCase().split(' ');
       const uniqueText = text.filter((item) => !fbTextContent.includes(item));
       fbTextContent.push(...uniqueText);
@@ -88,12 +107,141 @@ function removeLabelled() {
     for (const filter of splitselectedFilter) {
       const results = fuse.search(filter);
       for (const result of results) {
-        for (const toRemove of targetDivs){
+        for (const toRemove of targetTexts){
           if(toRemove.textContent.toLowerCase().includes(result.item)){
           const postContainer = toRemove.closest("div[class*='x9f619 x1n2onr6 x1ja2u2z x2bj2ny x1qpq9i9 xdney7k xu5ydu1 xt3gfkd xh8yej3 x6ikm8r x10wlt62 xquyuld']")
             if (postContainer && postContainer.style.display !== 'none') {
               postContainer.setAttribute('style', 'display: none !important');
               console.log(`Removed post: ${toRemove.textContent}\n${result.item} (${result.score})`);
+            }
+          }
+        }
+      }
+    }
+
+    for (const filter of splitselectedFilter) {
+      const results = fuse.search(filter);
+      for (const result of results) {
+        for (const toRemoveComment of commentText){
+          if(toRemoveComment.textContent.toLowerCase().includes(result.item)){
+            const commentContainer = toRemoveComment.closest("div[class*='x1n2onr6']")
+            if (commentContainer && commentContainer.style.display !== 'none') {
+              commentContainer.setAttribute('style', 'display: none !important');
+              console.log(`Removed comment: ${toRemoveComment.textContent}\n${result.item} (${result.score})`);
+            }
+          }
+        }
+      }
+    }
+
+    for (const filter of splitselectedFilter) {
+      const results = fuse.search(filter);
+      for (const result of results) {
+        for (const toRemoveComment of commentText) {
+          const popupCommentContainer = toRemoveComment.closest("div[class='x1n2onr6 x4uap5 x18d9i69 x1swvt13 x1iorvi4 x78zum5 x1q0g3np x1a2a7pz'");
+          if(popupCommentContainer && popupCommentContainer.style.display !== "none"){
+            popupCommentContainer.setAttribute("style", "display: none !important;");
+            console.log(`Removed pop-up comment: ${toRemoveComment.textContent}\n${result.item} (${result.score})`);
+          }
+        }
+      }
+    }
+  }
+
+  function instagramFilter(){
+
+    const igTextContent = [];
+    const targetElements = document.querySelectorAll("h1, span");
+    const captionContainer = document.querySelectorAll("h1[class*='_aacl _aaco _aacu _aacx _aad7 _aade'");
+    const commentContainer = document.querySelectorAll("span[class*='_aacl _aaco _aacu _aacx _aad7 _aade'");
+
+    for (const targetText of targetElements) {
+      const text = targetText.textContent.toLowerCase().split(' ');
+      const uniqueText = text.filter((item) => !igTextContent.includes(item));
+      igTextContent.push(...uniqueText);
+    }
+
+    const fuse = new Fuse(igTextContent, options);
+
+    for (let i = 0; i < selectedFilter.length; i++) {
+      const words = selectedFilter[i].split(" ");
+      splitselectedFilter.push(...words);
+    }
+
+    for (const filter of splitselectedFilter) {
+      const results = fuse.search(filter);
+      for (const result of results) {
+        for (const toRemoveCaption of captionContainer){
+          if (toRemoveCaption.textContent.toLowerCase().includes(result.item)){
+            const postContainer = toRemoveCaption.closest("article");
+              if (postContainer && postContainer.style.display !== 'none') {
+                postContainer.setAttribute('style', 'display: none !important');
+                console.log(`Removed post: ${toRemove.textContent}\n${result.item} (${result.score})`);
+              }
+          }
+        }
+      }
+    }
+
+    for (const filter of splitselectedFilter){
+      const results = fuse.search(filter);
+      for (const result of results){
+        for (const toRemoveComment of commentContainer){
+          if (toRemoveComment.textContent.toLowerCase().includes(result.item)){
+            const commentContainer = toRemoveComment.closest("ul[class*='_a9ym']");
+              if (commentContainer && commentContainer.style.display !== 'none') {
+                commentContainer.setAttribute('style', 'display: none !important');
+                console.log(`Removed pop-up comment: ${toRemoveComment.textContent}\n${result.item} (${result.score})`);
+              }
+          }
+        }
+      }
+    }
+
+    for (const filter of splitselectedFilter){
+      const results = fuse.search(filter);
+      for (const result of results){
+        for (const toRemovePopupComment of commentContainer){
+          if (toRemovePopupComment.textContent.toLowerCase().includes(result.item)){
+            const popupCommentContainer = toRemovePopupComment.closest("div[class*='x9f619 xjbqb8w x78zum5 x168nmei x13lgxp2 x5pf9jr xo71vjh x12nagc x1n2onr6 x1plvlek xryxfnj x1c4vz4f x2lah0s x1q0g3np x6s0dn4 x1oa3qoh x1nhvcw1']");
+              if (popupCommentContainer && popupCommentContainer.style.display !== 'none') {
+                popupCommentContainer.setAttribute('style', 'display: none !important');
+                console.log(`Removed comment: ${toRemovePopupComment.textContent}\n${result.item} (${result.score})`);
+              }
+          }
+        }
+      }
+    }
+  }
+
+  function redditFilter(){
+  }
+
+  function blurTextContent(){
+    const htmlTextContent = [];
+    const targetElements = document.querySelectorAll("p, h1, h2, h3, h4, h5, h6");
+    const blurStyle = "color: transparent; text-shadow: 0 0 8px #000;";
+
+    for (const targetText of targetElements) {
+      const text = targetText.textContent.toLowerCase().split(' ');
+      const uniqueText = text.filter((item) => !htmlTextContent.includes(item));
+      htmlTextContent.push(...uniqueText);
+    }
+
+    const fuse = new Fuse(htmlTextContent, options);
+
+    for (let i = 0; i < selectedFilter.length; i++) {
+      const words = selectedFilter[i].split(" ");
+      splitselectedFilter.push(...words);
+    }
+
+    for (const filter of splitselectedFilter) {
+      const results = fuse.search(filter);
+      for (const result of results) {
+        for (const toBlur of targetElements){
+          if (toBlur.textContent.toLowerCase().includes(result.item)){
+            if(toBlur && toBlur.style.color !== "transparent"){
+              toBlur.setAttribute("style", blurStyle);
             }
           }
         }
@@ -105,6 +253,12 @@ function removeLabelled() {
     twitterFilter();
   } else if (window.location.hostname === 'www.facebook.com') {
     facebookFilter();
+  } else if (window.location.hostname === 'www.instagram.com') {
+    instagramFilter();
+  } else if (window.location.hostname === 'www.reddit.com') {
+    redditFilter();
+  } else {
+    blurTextContent();
   }
 }
 
@@ -190,7 +344,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     // Check if appliedFilters contains 'custom' 
     chrome.storage.local.get("appliedFilters", function(result){
-      if(result.appliedFilters.includes('custom')){
+      if(result.appliedFilters.includes("custom")){
         // Add custom filters to the selectedFilter array
         selectedFilter.push(...words);
         chrome.storage.local.set({ selectedFilter: selectedFilter });
@@ -204,11 +358,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     // Send a message to the background script to update custom filters
     chrome.runtime.sendMessage({ type: 'updateCustomFilters', customFilters: customFilter });
-
-    // Send a message to the content script with the updated selected filters
-    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, { type: "applyFilters", appliedFilters: selectedFilter });
-    });
   }
   // Run the script removedLabelled every 3 seconds
   setInterval(removeLabelled, 3000);
