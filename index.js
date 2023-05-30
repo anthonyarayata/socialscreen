@@ -4,17 +4,19 @@ import './src/popup.mjs';
 
 // Apply filters when the "Apply Filters" button is clicked
 function applyFilters() {
-  // Get the selected filters from the checkboxes and text field
-  const customFilter = document.getElementById('customFilter').checked;
-  const profanityFilter = document.getElementById('profanityFilter').checked;
+  // Get the selected filters from the checkboxes and text field 
   const controversialFilter = document.getElementById('controversialFilter').checked;
+  const profanityFilter = document.getElementById('profanityFilter').checked;
+  const sexualFilter = document.getElementById('sexualFilter').checked;
+  const customFilter = document.getElementById('customFilter').checked;
   const customWords = document.getElementById('customWords').value.split(',');
 
   // Store the selected filters in an object
   const filters = {
-    custom: customFilter,
-    profanity: profanityFilter,
     controversial: controversialFilter,
+    profanity: profanityFilter,
+    sexualFilter: sexualFilter,
+    custom: customFilter,
     customWords: customWords
   };
 

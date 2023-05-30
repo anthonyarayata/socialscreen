@@ -1,8 +1,9 @@
 document.addEventListener("DOMContentLoaded", function() {
   // Get the necessary DOM elements
-  const customCheckbox = document.getElementById("customFilter");
-  const profanityCheckbox = document.getElementById("profanityFilter");
   const controversialCheckbox = document.getElementById("controversialFilter");
+  const profanityCheckbox = document.getElementById("profanityFilter");
+  const sexualCheckbox = document.getElementById("sexualFilter");
+  const customCheckbox = document.getElementById("customFilter");
   const customWordsInput = document.getElementById("customWords");
   const addCustomWordButton = document.getElementById("addCustomWordButton");
   const applyFiltersButton = document.getElementById("applyFiltersButton");
@@ -86,6 +87,11 @@ document.addEventListener("DOMContentLoaded", function() {
     if (controversialCheckbox.checked) {
       // Add controversial filters to the applied filters array
       appliedFilters.push("controversial");
+    }
+
+    if (sexualCheckbox.checked) {
+      // Add sexual filters to the applied filters array
+      appliedFilters.push("sexual");
     }
 
     // Save applied filters to storage

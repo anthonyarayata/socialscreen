@@ -1,14 +1,16 @@
 import Fuse from 'fuse.js';
 import controversialData from '/src/filters/controversial.json';
 import profanityData from '/src/filters/profanity.json';
+import sexualData from '/src/filters/sexual.json';
 
 // Define the selectedFilter array
 let selectedFilter = [];
 
-// Initialize the filter arrays
+// Initialize the filter arrays 
 let controversialFilter = [];
-let customFilter = [];
 let profanityFilter = [];
+let sexualFilter = [];
+let customFilter = [];
 
 // Push filter values from controversialData to controversialFilter
 if (controversialData && Array.isArray(controversialData.filter)) {
@@ -18,6 +20,11 @@ if (controversialData && Array.isArray(controversialData.filter)) {
 // Push filter values from profanityData to profanityFilter
 if (profanityData && Array.isArray(profanityData.filter)) {
   profanityFilter.push(...profanityData.filter);
+}
+
+// Push filter values from sexualData to sexualFilter
+if (sexualData && Array.isArray(sexualData.filter)) {
+  sexualFilter.push(...sexualData.filter);
 }
 
 // Load selected filters from Chrome storage
@@ -381,20 +388,24 @@ function removeLabelled() {
 removeLabelled();
 
 // Check if the filters are already in Chrome storage
-chrome.storage.local.get(['controversialFilter', 'profanityFilter'], data => {
+chrome.storage.local.get(['controversialFilter', 'profanityFilter', 'sexualFilter'], data => {
   controversialFilter = data.controversialFilter || [];
   profanityFilter = data.profanityFilter || [];
+  sexualFilter = data.sexualFilter || [];
   console.log('Controversial Filter (from Chrome storage):', controversialFilter);
   console.log('Profanity Filter (from Chrome storage):', profanityFilter);
+  console.log('Sexual Filter (from Chrome storage):', sexualFilter);
 });
 
 // Save filters to Chrome storage
 chrome.storage.local.set({
   controversialFilter: controversialFilter,
-  profanityFilter: profanityFilter
+  profanityFilter: profanityFilter,
+  sexualFilter: sexualFilter
 }, () => {
   console.log('Controversial Filter (saved to Chrome storage):', controversialFilter);
   console.log('Profanity Filter (saved to Chrome storage):', profanityFilter);
+  console.log('Sexual Filter (saved to Chrome storage):', sexualFilter);
 });
 
 // Load custom filters from Chrome storage
@@ -429,9 +440,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     chrome.storage.local.set({ selectedFilter: []})
     selectedFilter = [];
 
-    if (request.appliedFilters.includes('custom')) {
-      // Add custom filters to the selectedFilter array
-      selectedFilter.push(...customFilter);
+    if (request.appliedFilters.includes('controversial')) {
+      // Add controversial filters to the selectedFilter array
+      selectedFilter.push(...controversialFilter);
     }
 
     if (request.appliedFilters.includes('profanity')) {
@@ -439,9 +450,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       selectedFilter.push(...profanityFilter);
     }
 
-    if (request.appliedFilters.includes('controversial')) {
-      // Add controversial filters to the selectedFilter array
-      selectedFilter.push(...controversialFilter);
+    if (request.appliedFilters.includes('sexual')) {
+      // Add sexual filters to the selectedFilter array
+      selectedFilter.push(...sexualFilter);
+    }
+
+    if (request.appliedFilters.includes('custom')) {
+      // Add custom filters to the selectedFilter array
+      selectedFilter.push(...customFilter);
     }
 
     // Save selected filters to Chrome storage
