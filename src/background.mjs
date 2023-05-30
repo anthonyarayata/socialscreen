@@ -34,7 +34,7 @@ chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => 
 
 // Listen for web navigation completed events
 chrome.webNavigation.onCompleted.addListener(async (details) => {
-  if (details.frameId === 0 && (details.url.includes('https://twitter.com/') || details.url.includes('https://www.facebook.com/'))) {
+  if (details.frameId === 0 && (details.url.startsWith('https://twitter.com/') || details.url.startsWith('https://www.facebook.com/'))) {
     // Send a message to the content script indicating tab update
     chrome.tabs.sendMessage(details.tabId, {
       action: "tabUpdated",
@@ -42,4 +42,4 @@ chrome.webNavigation.onCompleted.addListener(async (details) => {
       url: details.url
     });
   }
-}, { url: [{ hostEquals: 'twitter.com' }, { hostEquals: 'www.facebook.com' }] }); // Specify the URL filter for onCompleted event
+}, { url: [{ hostEquals: 'twitter.com' }, { hostEquals: 'www.facebook.com' }, "*://*/*"] }); // Specify the URL filter for onCompleted event
