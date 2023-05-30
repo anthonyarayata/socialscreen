@@ -1,5 +1,3 @@
-import { chrome } from 'webextension-polyfill';
-
 // Listen for messages from content scripts
 chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {
   if (message.action === "tabUpdated" && (message.url.includes('https://twitter.com/') || message.url.includes('https://www.facebook.com/') || message.url.includes('https://www.reddit.com/') || message.url.includes('https://www.instagram.com/'))) {

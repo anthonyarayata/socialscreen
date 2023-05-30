@@ -238,11 +238,11 @@ function removeLabelled() {
     }
   }
   
-  function redditFilter(){
+  function redditFilter (){
     const redditTextContent = new Set();
-    const postText = document.querySelectorAll("div[class*='_1oQyIsiPHYt6nx7VOmd1sz _1RYN-7H8gYctjOQeL8p2Q7']");
+    const postText = document.querySelectorAll("div[class='_2FCtq-QzlfuN-SwVMUZMM3 _3wiKjmhpIpoTE2r5KCm2o6 t3_13vurf1']");
     const carouselContainer = document.querySelectorAll("div[class='_3GfG_jvS9X-90Q_8zU4uCu _3Y1KnhioRYkYGb93uAKhBZ']");
-    const targetElements = document.querySelectorAll("h3[class='eYtD2XCVieq6emjKBH3m'], p[class='_1qeIAgB0cPwnLhDF9XSiJM'], h2[class='_10WwrR6QeKoqfxT3UBj0Qq'], div[class='_2Jjv0TAohMSydVpAgyhjhA']");
+    const targetElements = document.querySelectorAll("h3[class*='eYtD2XCVieq6emjKBH3m'], p[class='_1qeIAgB0cPwnLhDF9XSiJM'], h2[class='_10WwrR6QeKoqfxT3UBj0Qq'], div[class='_2Jjv0TAohMSydVpAgyhjhA']");
     const postThread = document.querySelectorAll("shreddit-comment[class='pt-md px-md xs:px-0']");
     const rightRail = document.querySelectorAll("reddit-pdp-right-rail-post");
     const hideStyle = "display: none !important;";
@@ -264,8 +264,6 @@ function removeLabelled() {
       const text = targetText.textContent.toLowerCase().split(" ");
       text.forEach(word => redditTextContent.add(word));
     }
-
-    console.log(redditTextContent);
 
     const fuse = new Fuse(Array.from(redditTextContent), options);
 
