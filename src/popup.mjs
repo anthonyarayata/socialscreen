@@ -44,6 +44,16 @@ document.addEventListener("DOMContentLoaded", function() {
       // Push custom words to the added words array
       addedWords.push(...customWords.split(","));
 
+      if (appliedFilters.includes("custom")) {
+        // Add the word to the selectedFilter in the chrome storage
+        chrome.storage.local.get("selectedFilter", function(result) {
+          if (result.selectedFilter && Array.isArray(result.selectedFilter)) {
+            result.selectedFilter.push(...customWords.split(","));
+            chrome.storage.local.set({ selectedFilter: result.selectedFilter });
+          }
+        });
+      }
+
       // Save added words to storage
       chrome.storage.local.set({ addedWords: addedWords }, function() {
         console.log("Added words:", addedWords);
