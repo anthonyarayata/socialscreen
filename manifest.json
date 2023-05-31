@@ -11,7 +11,8 @@
     "storage",
     "scripting",
     "webNavigation",
-    "tabs"
+    "tabs",
+    "activeTab"
   ],
   "action": {
     "default_popup": "src/popup.html"
