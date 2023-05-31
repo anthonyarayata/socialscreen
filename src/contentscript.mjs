@@ -36,30 +36,36 @@ chrome.storage.local.get('selectedFilter', data => {
 function removeLabelled() {
   const options = {
     includeScore: true,
-    threshold: 0.1
+    threshold: 0.1,
+    distance: "levenshtein"
   };
 
 
-  // This function is designed specifically for Twitter
   function twitterFilter() {
     const spanContent = new Set();
     const spanSelector = "main span";
     const postSelector = "div[class*='css-1dbjc4n r-1igl3o0 r-qklmqi r-1adg3ll r-1ny4l3l']";
     const commentSelector = "div[class*='css-901oao r-1nao33i r-37j5jr r-a023e6 r-16dba41 r-rjixqe r-bcqeeo r-bnwqim r-qvutc0'] span[class*='css-901oao css-16my406 r-poiln3 r-bcqeeo r-qvutc0']";
     const trendingSelector = "div[class='css-1dbjc4n r-1adg3ll r-1ny4l3l']";
-    const hidePost = "display: none !important;";
-  
+    const hideStyle = "display: none !important;";
+
     // Collect unique text content from spans
     document.querySelectorAll(spanSelector).forEach(span => {
       const text = span.textContent.toLowerCase().split(' ');
       text.forEach(word => spanContent.add(word));
     });
-  
+
+    // Collect unique text from trending
+    document.querySelectorAll(trendingSelector).forEach(trending => {
+      const text = trending.textContent.toLowerCase().split(' ');
+      text.forEach(word => spanContent.add(word));
+    });
+
     const fuse = new Fuse(Array.from(spanContent), options);
-  
+
     // Split the selectedFilter array into individual words (Fuse can only search single word strings)
     const splitselectedFilter = selectedFilter.flatMap(filter => filter.split(' '));
-  
+
     // Remove posts
     for (const filter of splitselectedFilter) {
       const results = fuse.search(filter);
@@ -67,16 +73,16 @@ function removeLabelled() {
         document.querySelectorAll(postSelector).forEach(post => {
           const postText = post.querySelector(spanSelector)?.textContent.toLowerCase();
           if (postText && postText.includes(result.item)) {
-            const postContainer = post.closest(postSelector);
+            const postContainer = post.closest("div[class='css-1dbjc4n r-1igl3o0 r-qklmqi r-1adg3ll r-1ny4l3l']");
             if (postContainer && postContainer.style.display !== "none") {
-              postContainer.style = hidePost;
+              postContainer.style = hideStyle;
               console.log(`Removed post: ${postText}\n${result.item} (${result.score})`);
             }
           }
         });
       }
     }
-  
+
     // Remove comments
     for (const filter of splitselectedFilter) {
       const results = fuse.search(filter);
@@ -84,16 +90,16 @@ function removeLabelled() {
         document.querySelectorAll(commentSelector).forEach(comment => {
           const commentText = comment.textContent.toLowerCase();
           if (commentText.includes(result.item)) {
-            const commentContainer = comment.closest(commentSelector);
+            const commentContainer = comment.closest("div[class='css-1dbjc4n r-1igl3o0 r-qklmqi r-1adg3ll r-1ny4l3l']");
             if (commentContainer && commentContainer.style.display !== "none") {
-              commentContainer.style = hidePost;
+              commentContainer.style = hideStyle;
               console.log(`Removed comment: ${commentText}\n${result.item} (${result.score})`);
             }
           }
         });
       }
-    }
-    
+    }  
+
     // Remove trending topics
     for (const filter of splitselectedFilter) {
       const results = fuse.search(filter);
@@ -103,7 +109,7 @@ function removeLabelled() {
           if (trendingText.includes(result.item)) {
             const trendingContainer = trending.closest(trendingSelector);
             if (trendingContainer && trendingContainer.style.display !== "none") {
-              trendingContainer.style = hidePost;
+              trendingContainer.style = hideStyle;
               console.log(`Removed trending topic: ${trendingText}\n${result.item} (${result.score})`);
             }
           }
@@ -111,7 +117,6 @@ function removeLabelled() {
       }
     }
   }
-
   
   function facebookFilter() {
     const fbTextContent = new Set();
@@ -421,19 +426,6 @@ observer.observe(document.body, {
   subtree: true
 });
 
-// Send a message to the background script to retrieve custom filters
-chrome.runtime.sendMessage({ type: 'getCustomFilters' }, response => {
-  if (response.customFilters && Array.isArray(response.customFilters)) {
-    // Update the customFilter array
-    customFilter = [...response.customFilters];
-
-    // Save custom filters to Chrome storage
-    chrome.storage.local.set({ customFilters: customFilter });
-
-    console.log('Custom Filter (updated from background script):', customFilter);
-  }
-});
-
 // Listen for messages from the popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.appliedFilters && Array.isArray(request.appliedFilters)) {
@@ -474,15 +466,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const words = request.customWords.split(',').map(word => word.trim());
     customFilter.push(...words);
 
-    // Check if appliedFilters contains 'custom' 
-    chrome.storage.local.get("appliedFilters", function(result){
-      if(result.appliedFilters.includes("custom")){
-        // Add custom filters to the selectedFilter array
-        selectedFilter.push(...words);
-        chrome.storage.local.set({ selectedFilter: selectedFilter });
-      }
-    });
-
     // Save custom filters to Chrome storage
     chrome.storage.local.set({ customFilters: customFilter });
 
@@ -490,7 +473,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     // Send a message to the background script to update custom filters
     chrome.runtime.sendMessage({ type: 'updateCustomFilters', customFilters: customFilter });
-  }
-  // Run the script removedLabelled every .5 seconds
-  setInterval(removeLabelled, 500);
+    removeLabelled();
+  }   
 });

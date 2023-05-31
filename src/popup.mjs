@@ -45,16 +45,6 @@ document.addEventListener("DOMContentLoaded", function() {
       // Push custom words to the added words array
       addedWords.push(...customWords.split(","));
 
-      if (appliedFilters.includes("custom")) {
-        // Add the word to the selectedFilter in the chrome storage
-        chrome.storage.local.get("selectedFilter", function(result) {
-          if (result.selectedFilter && Array.isArray(result.selectedFilter)) {
-            result.selectedFilter.push(...customWords.split(","));
-            chrome.storage.local.set({ selectedFilter: result.selectedFilter });
-          }
-        });
-      }
-
       // Save added words to storage
       chrome.storage.local.set({ addedWords: addedWords }, function() {
         console.log("Added words:", addedWords);
@@ -118,74 +108,50 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Update the checkboxes based on the applied filters
   function updateCheckboxes() {
-    customCheckbox.checked = appliedFilters.includes("custom");
-    profanityCheckbox.checked = appliedFilters.includes("profanity");
     controversialCheckbox.checked = appliedFilters.includes("controversial");
+    profanityCheckbox.checked = appliedFilters.includes("profanity");
+    sexualCheckbox.checked = appliedFilters.includes("sexual");
+    customCheckbox.checked = appliedFilters.includes("custom");
   }
 
-// Display the custom filter in the popup
-function displayCustomFilter(popupCustomFilter) {
-  let html = "<h2>Custom Filter List</h2>";
-  if (popupCustomFilter.length > 0) {
-    html += "<ul>";
-    popupCustomFilter.forEach(function(word) {
-      html += "<li>" + word + " <button class='removeWordButton' data-word='" + word + "'>x</button></li>";
-    });
-    html += "</ul>";
-  } else {
-    html += "<p>No custom filter selected.</p>";
-  }
-  customFilterContainer.innerHTML = html;
-  customFilterContainer.style.display = "block"; // Show the custom filter container
-
-  // Function to remove a word from the custom filter
-  function removeCustomFilterWord(word) {
-    const index = popupCustomFilter.indexOf(word);
-    if (index !== -1) {
-      popupCustomFilter.splice(index, 1);
-      // Save updated custom filter to storage
-      chrome.storage.local.set({ customFilters: popupCustomFilter }, function() {
-        console.log("Custom filter updated:", popupCustomFilter);
+  // Display the custom filter in the popup
+  function displayCustomFilter(popupCustomFilter) {
+    let html = "<h2>Custom Filter List</h2>";
+    if (popupCustomFilter.length > 0) {
+      html += "<ul>";
+      popupCustomFilter.forEach(function(word) {
+        html += "<li>" + word + " <button class='removeWordButton' data-word='" + word + "'>x</button></li>";
       });
-      if(customCheckbox.checked) {
-         chrome.storage.local.set({ selectedFilter: popupCustomFilter });
-      }
-      // Refresh the displayed custom filter
-      displayCustomFilter(popupCustomFilter);
+      html += "</ul>";
+    } else {
+      html += "<p>No custom filter selected.</p>";
     }
-  }
-  // Add event listeners to the remove word buttons
-  const removeWordButtons = document.getElementsByClassName("removeWordButton");
-  for (let i = 0; i < removeWordButtons.length; i++) {
-    removeWordButtons[i].addEventListener("click", function(event) {
-      const word = event.target.dataset.word;
-      removeCustomFilterWord(word);
-    });
-  }
-}
+    customFilterContainer.innerHTML = html;
+    customFilterContainer.style.display = "block"; // Show the custom filter container
 
-  // Function to refresh the page
-  // Function to refresh Facebook, Twitter, and Instagram tabs
-  function refreshPage() {
-    chrome.tabs.query({}, function(tabs) {
-      tabs.forEach(function(tab) {
-        if (isSocialMediaTab(tab.url)) {
-          chrome.tabs.reload(tab.id);
+    // Function to remove a word from the custom filter
+    function removeCustomFilterWord(word) {
+      const index = popupCustomFilter.indexOf(word);
+      if (index !== -1) {
+        popupCustomFilter.splice(index, 1);
+        // Save updated custom filter to storage
+        chrome.storage.local.set({ customFilters: popupCustomFilter }, function() {
+          console.log("Custom filter updated:", popupCustomFilter);
+        });
+        if(customCheckbox.checked) {
+          chrome.storage.local.set({ selectedFilter: popupCustomFilter });
         }
+        // Refresh the displayed custom filter
+        displayCustomFilter(popupCustomFilter);
+      }
+    }
+    // Add event listeners to the remove word buttons
+    const removeWordButtons = document.getElementsByClassName("removeWordButton");
+    for (let i = 0; i < removeWordButtons.length; i++) {
+      removeWordButtons[i].addEventListener("click", function(event) {
+        const word = event.target.dataset.word;
+        removeCustomFilterWord(word);
       });
-    });
-  }
-
-  function delayedRefresh() {
-    setTimeout(refreshPage, 1000);
-  }
-
-  // Function to check if a URL belongs to Facebook, Twitter, or Instagram
-  function isSocialMediaTab(url) {
-    return (
-      url.includes("facebook.com") ||
-      url.includes("twitter.com") ||
-      url.includes("instagram.com")
-    );
+    }
   }
 });

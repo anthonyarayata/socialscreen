@@ -13,21 +13,6 @@ chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => 
     // You can send a response back to the sender if needed
     // sendResponse({ response: "Filters applied" });
   }
-
-  if (message.type === "addCustomFilter") {
-    const customWords = message.customWords.trim();
-
-    if (customWords !== "") {
-      let customFilter = [];
-      chrome.storage.local.get("customFilter", function(result) {
-        if (result.customFilter && Array.isArray(result.customFilter)) {
-          customFilter = result.customFilter;
-        }
-        customFilter.push(...customWords.split(","));
-        chrome.storage.local.set({ customFilter: customFilter });
-      });
-    }
-  }
 });
 
 // Listen for web navigation completed events
