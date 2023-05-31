@@ -11,6 +11,7 @@ let controversialFilter = [];
 let profanityFilter = [];
 let sexualFilter = [];
 let customFilter = [];
+let appliedFilters = [];
 
 // Push filter values from controversialData to controversialFilter
 if (controversialData && Array.isArray(controversialData.filter)) {
@@ -393,13 +394,15 @@ function removeLabelled() {
 removeLabelled();
 
 // Check if the filters are already in Chrome storage
-chrome.storage.local.get(['controversialFilter', 'profanityFilter', 'sexualFilter'], data => {
+chrome.storage.local.get(['controversialFilter', 'profanityFilter', 'sexualFilter', 'appliedFilters'], data => {
   controversialFilter = data.controversialFilter || [];
   profanityFilter = data.profanityFilter || [];
   sexualFilter = data.sexualFilter || [];
+  appliedFilters = data.appliedFilters || [];
   console.log('Controversial Filter (from Chrome storage):', controversialFilter);
   console.log('Profanity Filter (from Chrome storage):', profanityFilter);
   console.log('Sexual Filter (from Chrome storage):', sexualFilter);
+  console.log('Applied Filters (from Chrome storage):', appliedFilters);
 });
 
 // Save filters to Chrome storage
@@ -428,6 +431,7 @@ observer.observe(document.body, {
 
 // Listen for messages from the popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+
   if (request.appliedFilters && Array.isArray(request.appliedFilters)) {
     chrome.storage.local.set({ selectedFilter: []})
     selectedFilter = [];
@@ -471,8 +475,32 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     console.log('Custom Filter (updated with new words):', customFilter);
 
+    if (appliedFilters.includes('custom')) {
+      // Add custom filters to the selectedFilter array
+      selectedFilter.push(...customFilter);
+      console.log('Selected Filter (updated with new words):', selectedFilter);
+      removeLabelled();
+    }
+
     // Send a message to the background script to update custom filters
     chrome.runtime.sendMessage({ type: 'updateCustomFilters', customFilters: customFilter });
-    removeLabelled();
   }   
+
+  if(request.type === 'removeCustomFilter' && request.customFilters && Array.isArray(request.customFilters)){
+
+    customFilter = request.customFilters;
+    
+    chrome.storage.local.set({ customFilters: customFilter });
+
+    console.log('Custom Filter (updated with removed words):', customFilter);
+
+    if (appliedFilters.includes('custom')) {
+      // Add custom filters to the selectedFilter array in the chrome storage
+      selectedFilter.push(...customFilter);
+      chrome.storage.local.set({ selectedFilter: selectedFilter });
+      console.log('Selected Filter (updated with removed words):', selectedFilter);
+      removeLabelled();
+    }
+  }
 });
+

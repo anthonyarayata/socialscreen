@@ -45,11 +45,6 @@ document.addEventListener("DOMContentLoaded", function() {
       // Push custom words to the added words array
       addedWords.push(...customWords.split(","));
 
-      // Save added words to storage
-      chrome.storage.local.set({ addedWords: addedWords }, function() {
-        console.log("Added words:", addedWords);
-      });
-
       // Send a message to the content script to update custom filters
       chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, { type: "addCustomFilter", customWords: customWords });
@@ -85,9 +80,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // Save applied filters to storage
-    chrome.storage.local.set({ appliedFilters: appliedFilters }, function () {
-      console.log("Applied filters updated:", appliedFilters);
-    });
+    chrome.storage.local.set({ appliedFilters: appliedFilters });
 
     // Send message to the content script with the applied filters
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
@@ -98,6 +91,12 @@ document.addEventListener("DOMContentLoaded", function() {
   // Event listener for the "Show Custom Filter" button
   showCustomFilterButton.addEventListener("click", function() {
     if (customFilterContainer.style.display === "none") {
+      // Push customFilter from chrome storage to popupCustomFilter
+      chrome.storage.local.get("customFilters", function(result) {
+        if (result.customFilters && Array.isArray(result.customFilters)) {
+          popupCustomFilter = result.customFilters;
+        }
+      });
       // Display the added words as the custom filter
       displayCustomFilter(popupCustomFilter);
       customFilterContainer.style.display = "block"; // Show the custom filter container
@@ -134,15 +133,10 @@ document.addEventListener("DOMContentLoaded", function() {
       const index = popupCustomFilter.indexOf(word);
       if (index !== -1) {
         popupCustomFilter.splice(index, 1);
-        // Save updated custom filter to storage
-        chrome.storage.local.set({ customFilters: popupCustomFilter }, function() {
-          console.log("Custom filter updated:", popupCustomFilter);
+        // Send a message to the content script to update custom filters
+        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+          chrome.tabs.sendMessage(tabs[0].id, { type: "removeCustomFilter", customFilters: popupCustomFilter });
         });
-        if(customCheckbox.checked) {
-          chrome.storage.local.set({ selectedFilter: popupCustomFilter });
-        }
-        // Refresh the displayed custom filter
-        displayCustomFilter(popupCustomFilter);
       }
     }
     // Add event listeners to the remove word buttons
@@ -151,6 +145,7 @@ document.addEventListener("DOMContentLoaded", function() {
       removeWordButtons[i].addEventListener("click", function(event) {
         const word = event.target.dataset.word;
         removeCustomFilterWord(word);
+        displayCustomFilter(popupCustomFilter);
       });
     }
   }
