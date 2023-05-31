@@ -1,0 +1,157 @@
+/* Global styles */
+body {
+    padding: 20px;
+    border: 1px solid #000000; 
+    background-color: #FFFFFF;
+  }
+  
+  h1 {
+    text-align: center;
+    margin-top: 0; 
+    color: #27374D;
+    font-family: sans-serif;
+    font-size: 27px;
+    
+  }
+
+  .indent {
+    margin-left: 20px;
+  }
+  
+  .input-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .input-container input[type="text"] {
+    margin-right: 10px;
+  }
+  
+  .input-container button {
+    padding: 5px 10px;
+  }
+  
+  /* Form styles */
+  label {
+    display: inline-block;
+    margin-bottom: 5px;
+    color: #27374D;
+    font-family: sans-serif;
+    font-size: 16px;
+  }
+  
+  input[type="checkbox"] {
+    vertical-align: middle;
+    margin-top: 5px;
+    margin-right: 5px;
+  }
+  
+
+  /* Custom styles for input group */
+  .input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .input-group .form-control {
+    flex: 1;
+    margin-top: 10px;
+    font-family: sans-serif;
+    border-radius: 1px;
+    height: 28px;
+  }
+
+  .input-group .btn {
+    margin-top: 10px;
+    border-radius: 0 5px 5px 0;
+    height: 31.5px; 
+    min-width: 50px; 
+    background-color: #4A4A4A;
+    color: #FFFFFF;
+    border: none;
+  }
+
+
+  button {
+    padding: 5px 10px;
+  }
+  
+  .button-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; 
+    margin-top: 10px;
+  }
+  
+  /* Apply and Show Custom Filters Button */
+  .button-container button {
+    padding: 3px 8px;
+    margin-left: 5px;
+    font-family: sans-serif;
+    border-radius: 10px;
+    background-color: #4A4A4A;
+    color: #ffffff;
+    border: none;
+  }
+  
+  .button-container button:first-child {
+    margin-left: 0; 
+    margin-right: 5px; 
+  }
+  
+  /* Custom Filter Container styles */
+#customFilterContainer {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #C9C9C2;
+  display: none;
+  font-family: sans-serif;
+}
+
+#customFilterContainer h2 {
+  margin-top: 0;
+  font-family: sans-serif;
+}
+
+#customFilterContainer ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+#customFilterContainer li {
+  margin-bottom: 5px;
+  font-family: sans-serif;
+}
+
+#customFilterContainer .removeWordButton {
+  margin-left: 5px;
+  padding: 2px 5px;
+  background-color: #ddd;
+  border: none;
+  cursor: pointer;
+  font-family: sans-serif;
+}
+
+#customFilterContainer .removeWordButton:hover {
+  background-color: #bbb;
+}
+
+.custom-filter-list {
+    width: fit-content; /* Adjust the width as needed */
+  }
+  
+  .custom-filter-list ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .custom-filter-list li {
+    overflow: hidden; /* Prevents the button from overflowing */
+  }
+  
+  .custom-filter-list li button.removeWordButton {
+    float: right; /* Moves the button to the right */
+  }
+  

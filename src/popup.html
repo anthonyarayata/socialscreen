@@ -2,11 +2,8 @@
 <html>
 <head>
   <title>Filter Selection</title>
-  <style>
-    .indent {
-      margin-left: 20px;
-    }
-  </style>
+  <link rel="stylesheet" type="text/css" href="popup.css">
+  <link rel="stylesheet" href="node_modules/bootstrap/dist/bootstrap.min.css">
 </head>
 <body>
   <h1>SocialScreen</h1>
@@ -24,13 +21,17 @@
   <input type="checkbox" id="customFilter" />
   <label for="customFilter">Custom Filter</label>
 
-  <div>
-    <input type="text" id="customWords" placeholder="Add custom words" />
-    <button id="addCustomWordButton">Add</button>
+  <div class="input-group mb-3">
+    <input type="text" id="customWords" class="form-control" placeholder="Add custom words">
+    <div class="input-group-append">
+      <button id="addCustomWordButton" class="btn btn-primary">Add</button>
+    </div>
   </div>
 
-  <button id="applyFiltersButton">Apply Filters</button>
-  <button id="showCustomFilterButton">Show Custom Filter</button> <!-- Added button -->
+  <div class="button-container">
+    <button id="showCustomFilterButton">Show Custom Filter</button> <!-- Added button -->
+    <button id="applyFiltersButton">Apply Filters</button>
+  </div>
 
   <div id="customFilterContainer" style="display: none;"></div> <!-- Container for displaying custom filter -->
 

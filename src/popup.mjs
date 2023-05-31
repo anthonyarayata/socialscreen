@@ -118,13 +118,17 @@ document.addEventListener("DOMContentLoaded", function() {
     let html = "<h2>Custom Filter List</h2>";
     if (popupCustomFilter.length > 0) {
       html += "<ul>";
-      popupCustomFilter.forEach(function(word) {
-        html += "<li>" + word + " <button class='removeWordButton' data-word='" + word + "'>x</button></li>";
+      popupCustomFilter.forEach(function (word) {
+        html += "<li>" + word + "<button class='removeWordButton' data-word='" + word + "'>x</button></li>";
       });
       html += "</ul>";
     } else {
       html += "<p>No custom filter selected.</p>";
     }
+    
+    // Add a CSS class to the ul element for styling
+    html = "<div class='custom-filter-list'>" + html + "</div>";
+    
     customFilterContainer.innerHTML = html;
     customFilterContainer.style.display = "block"; // Show the custom filter container
 

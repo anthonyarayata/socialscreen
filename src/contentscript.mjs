@@ -44,7 +44,7 @@ function removeLabelled() {
 
   function twitterFilter() {
     const spanContent = new Set();
-    const spanSelector = "main span";
+    const spanSelector = "div[class='css-901oao r-1nao33i r-37j5jr r-a023e6 r-16dba41 r-rjixqe r-bcqeeo r-bnwqim r-qvutc0']";
     const postSelector = "div[class*='css-1dbjc4n r-1igl3o0 r-qklmqi r-1adg3ll r-1ny4l3l']";
     const commentSelector = "div[class*='css-901oao r-1nao33i r-37j5jr r-a023e6 r-16dba41 r-rjixqe r-bcqeeo r-bnwqim r-qvutc0'] span[class*='css-901oao css-16my406 r-poiln3 r-bcqeeo r-qvutc0']";
     const trendingSelector = "div[class='css-1dbjc4n r-1adg3ll r-1ny4l3l']";
@@ -61,6 +61,8 @@ function removeLabelled() {
       const text = trending.textContent.toLowerCase().split(' ');
       text.forEach(word => spanContent.add(word));
     });
+
+    console.log(spanContent);
 
     const fuse = new Fuse(Array.from(spanContent), options);
 
@@ -433,7 +435,6 @@ observer.observe(document.body, {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
   if (request.appliedFilters && Array.isArray(request.appliedFilters)) {
-    chrome.storage.local.set({ selectedFilter: []})
     selectedFilter = [];
 
     if (request.appliedFilters.includes('controversial')) {
@@ -493,14 +494,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     chrome.storage.local.set({ customFilters: customFilter });
 
     console.log('Custom Filter (updated with removed words):', customFilter);
-
-    if (appliedFilters.includes('custom')) {
-      // Add custom filters to the selectedFilter array in the chrome storage
-      selectedFilter.push(...customFilter);
-      chrome.storage.local.set({ selectedFilter: selectedFilter });
-      console.log('Selected Filter (updated with removed words):', selectedFilter);
-      removeLabelled();
-    }
   }
 });
 
