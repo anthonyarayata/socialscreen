@@ -62,8 +62,6 @@ function removeLabelled() {
       text.forEach(word => spanContent.add(word));
     });
 
-    console.log(spanContent);
-
     const fuse = new Fuse(Array.from(spanContent), options);
 
     // Split the selectedFilter array into individual words (Fuse can only search single word strings)
