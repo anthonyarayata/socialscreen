@@ -2,7 +2,11 @@
   "manifest_version": 3,
   "name": "SocialScreen",
   "version": "0.9",
-  "description": "Filters out unwanted content from Facebook and Twitter.",
+  "description": "Filters out unwanted content from Facebook, Twitter, Instagram, and more.",
+  "icons": {
+    "48": "src/icons/48.png",
+    "128": "src/icons/128.png"
+  },
   "permissions": [
     "storage",
     "scripting",
