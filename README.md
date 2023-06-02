@@ -19,7 +19,7 @@ For users to be able to install the extension, they need to follow these steps:
 
 3. Open the Chromium browser where you wish to install the extension.
 
-<p align = "center"> <img src="src/installation guide/3.jpg"> </p>
+
 
 4. Click on the 3 dots on the upper right corner where your options are.
 
