@@ -155,14 +155,14 @@ body {
     float: right; /* Moves the button to the right */
   }
   
-  #customFilterContainer .addCustomWordButton:hover {
+  .addCustomWordButton:hover {
     background-color: #bbb;
   }
 
-  #customFilterContainer .applyFiltersButton:hover {
+  .applyFiltersButton:hover {
     background-color: #bbb;
   }
-
-  #customFilterContainer .showCustomFiltersButton:hover {
+  
+  .showCustomFiltersButton:hover {
     background-color: #bbb;
   }
