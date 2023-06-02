@@ -10,25 +10,48 @@ SocialScreen is currently in "pending review" status in the Chrome Web Store.
 For users to be able to install the extension, they need to follow these steps:
 
 1. Download the code as a zip file from this repository. 
+
 <p align = "center"> <img src="src/installation guide/1.jpg"> </p>
+
 2. Extract the contents in the desired folder.
+
 <p align = "center"> <img src="src/installation guide/2.jpg"> </p>
+
 3. Open the Chromium browser where you wish to install the extension.
+
 <p align = "center"> <img src="src/installation guide/3.jpg"> </p>
-4. Click on the 3 dots on the upper right corner where your options are. 
+
+4. Click on the 3 dots on the upper right corner where your options are.
+
 <p align = "center"> <img src="src/installation guide/4.jpg"> </p>
+
 5. Click on "Extensions" and then "Manage Extensions"
+
 <p align = "center"> <img src="src/installation guide/5.jpg"> </p>
+
 6. On the top-right corner, toggle "Developer Mode"
+
 <p align = "center"> <img src="src/installation guide/6.jpg"> </p>
+
 7. On the top-left corner, click on "Load Unpacked" and find the folder of the extracted zip file for SocialScreen, it should be named "socialscreen-main".
+
 <p align = "center"> <img src="src/installation guide/7.jpg"> </p>
+
 8. Open the "socialscreen-main" folder to see another one with the same name, select that folder.
+
 <p align = "center"> <img src="src/installation guide/8.jpg"> </p>
+
 9. Now SocialScreen should appear when you click on the puzzle piece icon for Extensions.
+
 <p align = "center"> <img src="src/installation guide/9.jpg"> </p>
+
 10. Pin the SocialScreen extension for ease-of-use.
+
 <p align = "center"> <img src="src/installation guide/10.jpg"> </p>
+
+11. Enjoy!
+
+<p align = "center"> <img src="src/installation guide/11.jpg"> </p>
 
 
 ## User Guide
