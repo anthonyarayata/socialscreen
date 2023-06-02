@@ -43,7 +43,10 @@ SocialScreen utilizes the following algorithms to provide effective content filt
 3. **Chrome API**: SocialScreen uses Chrome API's throughout the entire extension's structure.
 
 SocialScreen have specialized functions for each website that will remove posts, comments, and other website elements:
-* Twitter filter function will remove the posts, post comments, trending topics, and users. 
+* Twitter filter function removes the posts, post comments, trending topics, and users. 
+* Facebook and Instagram filter functions removes the posts, and post comments.
+* Reddit filter function removes the posts from the trending carousel, posts (but only limited to the body of the main thread and not the title), thread replies, and trending.
+* Other websites function will blur out the block of text that includes the filtered word.
 
 
 ## Feedback and Contributions
