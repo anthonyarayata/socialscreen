@@ -16,22 +16,25 @@ let appliedFilters = [];
 // Push filter values from controversialData to controversialFilter
 if (controversialData && Array.isArray(controversialData.filter)) {
   controversialFilter.push(...controversialData.filter);
+  console.log('Controversial Filter from JSON:', controversialFilter);
 }
 
 // Push filter values from profanityData to profanityFilter
 if (profanityData && Array.isArray(profanityData.filter)) {
   profanityFilter.push(...profanityData.filter);
+  console.log('Profanity Filter from JSON:', profanityFilter);
 }
 
 // Push filter values from sexualData to sexualFilter
 if (sexualData && Array.isArray(sexualData.filter)) {
   sexualFilter.push(...sexualData.filter);
+  console.log('Sexual Filter from JSON:', sexualFilter);
 }
 
 // Load selected filters from Chrome storage
 chrome.storage.local.get('selectedFilter', data => {
   selectedFilter = data.selectedFilter || [];
-  console.log('Selected Filter:', selectedFilter);
+  console.log('Selected Filter from chrome storage:', selectedFilter);
 });
 
 function removeLabelled() {
