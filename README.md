@@ -2,7 +2,7 @@
 
 
 ## Introduction
-SocialScreen, previously named Filterino, is a Chromium browser extension designed to filter unwanted content in social media platforms such as Facebook, Instagram, and Twitter. It removes the posts by manipulating the HTML document of a website. This means that does not directly interact with the users' social media accounts, but only the HTML document that allows them to see the posts in their feed. SocialScreen also has limited filtering functions for Reddit, and other websites.
+SocialScreen, previously named Filterino, is a Chromium browser extension designed to filter unwanted content in social media platforms such as Facebook, Instagram, and Twitter. It removes the posts by manipulating the HTML document of a website. This means that does not directly interact with the users' social media accounts, only the HTML document which allows them to see the posts in their feed. SocialScreen also has limited filtering functions for Reddit, and other websites.
 
 
 ## Installation Guide
