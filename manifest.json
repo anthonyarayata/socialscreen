@@ -9,7 +9,6 @@
   },
   "permissions": [
     "storage",
-    "scripting",
     "webNavigation",
     "tabs"
   ],

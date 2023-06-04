@@ -50,7 +50,7 @@ function removeLabelled() {
     const spanSelector = "div[class='css-901oao r-1nao33i r-37j5jr r-a023e6 r-16dba41 r-rjixqe r-bcqeeo r-bnwqim r-qvutc0']";
     const postSelector = "div[class*='css-1dbjc4n r-1igl3o0 r-qklmqi r-1adg3ll r-1ny4l3l']";
     const commentSelector = "div[class*='css-901oao r-1nao33i r-37j5jr r-a023e6 r-16dba41 r-rjixqe r-bcqeeo r-bnwqim r-qvutc0'] span[class*='css-901oao css-16my406 r-poiln3 r-bcqeeo r-qvutc0']";
-    const trendingSelector = "div[class='css-1dbjc4n r-1adg3ll r-1ny4l3l']";
+    const trendingSelector = "div[class*='css-1dbjc4n r-1adg3ll r-1ny4l3l']";
     const hideStyle = "display: none !important;";
 
     // Collect unique text content from spans
@@ -60,11 +60,11 @@ function removeLabelled() {
     });
 
     // Collect unique text from trending
-    document.querySelectorAll(trendingSelector).forEach(trending => {
+    document.querySelectorAll("div[class='css-901oao r-1nao33i r-37j5jr r-a023e6 r-b88u0q r-rjixqe r-1bymd8e r-bcqeeo r-qvutc0']").forEach(trending => {
       const text = trending.textContent.toLowerCase().split(' ');
       text.forEach(word => spanContent.add(word));
     });
-
+    
     const fuse = new Fuse(Array.from(spanContent), options);
 
     // Split the selectedFilter array into individual words (Fuse can only search single word strings)
@@ -108,7 +108,7 @@ function removeLabelled() {
     for (const filter of splitselectedFilter) {
       const results = fuse.search(filter);
       for (const result of results) {
-        document.querySelectorAll(trendingSelector).forEach(trending => {
+        document.querySelectorAll("div[class='css-901oao r-1nao33i r-37j5jr r-a023e6 r-b88u0q r-rjixqe r-1bymd8e r-bcqeeo r-qvutc0']").forEach(trending => {
           const trendingText = trending.textContent.toLowerCase();
           if (trendingText.includes(result.item)) {
             const trendingContainer = trending.closest(trendingSelector);
