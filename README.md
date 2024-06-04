@@ -71,8 +71,7 @@ SocialScreen is easy to use as the UI is pretty self explanatory but we will sti
 SocialScreen utilizes the following algorithms to provide effective content filtering:
 
 1. **Fuse.js**: The extension employs fuzzy matching and fuzzy search when matching the HTML documents against the filter datasets.
-2. **DOM Manipulation**: JavaScript DOM manipulation techniques are used to interact with and modify the HTML document, allowing for the filtering and manipulation of specific elements.
-3. **Chrome API**: SocialScreen uses Chrome API's throughout the entire extension's structure.
+2. **Chrome API**: SocialScreen uses Chrome API's throughout the entire extension's structure.
 
 SocialScreen have specialized functions for each website that will remove posts, comments, and other website elements:
 * Twitter filter function removes the posts, post comments, trending topics, and users. 
