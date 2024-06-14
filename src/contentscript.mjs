@@ -3,16 +3,55 @@ import controversialData from '/src/filters/controversial.json';
 import profanityData from '/src/filters/profanity.json';
 import sexualData from '/src/filters/sexual.json';
 
+<<<<<<< HEAD
 // Define the selectedFilter array
 let selectedFilter = [];
 
 // Initialize the filter arrays 
+=======
+const SELECTORS = {
+  TWITTER: {
+    SPAN: "div[class='css-901oao r-1nao33i r-37j5jr r-a023e6 r-16dba41 r-rjixqe r-bcqeeo r-bnwqim r-qvutc0']",
+    POST: "div[class*='css-1dbjc4n r-1igl3o0 r-qklmqi r-1adg3ll r-1ny4l3l']",
+    COMMENT: "div[class*='css-901oao r-1nao33i r-37j5jr r-a023e6 r-16dba41 r-rjixqe r-bcqeeo r-bnwqim r-qvutc0'] span[class*='css-901oao css-16my406 r-poiln3 r-bcqeeo r-qvutc0']",
+    TRENDING: "div[class*='css-1dbjc4n r-1adg3ll r-1ny4l3l']",
+    TRENDING_TEXT: "div[class='css-901oao r-1nao33i r-37j5jr r-a023e6 r-b88u0q r-rjixqe r-1bymd8e r-bcqeeo r-qvutc0']"
+  },
+  FACEBOOK: {
+    TEXT: "div[class*='xdj266r x11i5rnm xat24cr x1mh8g0r x1vvkbs']",
+    POST_CONTAINER: "div[class*='x1yztbdb x1n2onr6 xh8yej3 x1ja2u2z']",
+    COMMENT_CONTAINER: "div[class*='x1n2onr6']"
+  },
+  INSTAGRAM: {
+    ELEMENTS: "h1, span",
+    CAPTION: "h1[class*='_aacl _aaco _aacu _aacx _aad7 _aade']",
+    COMMENT: "span[class*='_aacl _aaco _aacu _aacx _aad7 _aade']",
+    POPUP_COMMENT: "div[class*='x9f619 xjbqb8w x78zum5 x168nmei x13lgxp2 x5pf9jr xo71vjh x12nagc x1n2onr6 x1plvlek xryxfnj x1c4vz4f x2lah0s x1q0g3np x6s0dn4 x1oa3qoh x1nhvcw1']"
+  },
+  REDDIT: {
+    POST_TEXT: "div[class='_2FCtq-QzlfuN-SwVMUZMM3 _3wiKjmhpIpoTE2r5KCm2o6 t3_13vurf1']",
+    CAROUSEL: "div[class='_3GfG_jvS9X-90Q_8zU4uCu _3Y1KnhioRYkYGb93uAKhBZ']",
+    TARGET_ELEMENTS: "h3[class*='eYtD2XCVieq6emjKBH3m'], p[class='_1qeIAgB0cPwnLhDF9XSiJM'], h2[class='_10WwrR6QeKoqfxT3UBj0Qq'], div[class='_2Jjv0TAohMSydVpAgyhjhA']",
+    POST_THREAD: "shreddit-comment[class='pt-md px-md xs:px-0']",
+    RIGHT_RAIL: "reddit-pdp-right-rail-post"
+  },
+  GENERAL: {
+    TEXT_ELEMENTS: "p, h1, h2, h3, h4, h5, h6"
+  }
+};
+
+const hideStyle = "display: none !important;";
+const blurStyle = "color: transparent; text-shadow: 0 0 8px #000;";
+
+let selectedFilter = [];
+>>>>>>> 505a582 (Refactored js files)
 let controversialFilter = [];
 let profanityFilter = [];
 let sexualFilter = [];
 let customFilter = [];
 let appliedFilters = [];
 
+<<<<<<< HEAD
 // Push filter values from controversialData to controversialFilter
 if (controversialData && Array.isArray(controversialData.filter)) {
   controversialFilter.push(...controversialData.filter);
@@ -381,6 +420,136 @@ function removeLabelled() {
     }
   }
 
+=======
+function loadFilters() {
+  if (controversialData && Array.isArray(controversialData.filter)) {
+    controversialFilter.push(...controversialData.filter);
+  }
+  if (profanityData && Array.isArray(profanityData.filter)) {
+    profanityFilter.push(...profanityData.filter);
+  }
+  if (sexualData && Array.isArray(sexualData.filter)) {
+    sexualFilter.push(...sexualData.filter);
+  }
+}
+
+function loadStoredFilters() {
+  chrome.storage.local.get('selectedFilter', data => {
+    selectedFilter = data.selectedFilter || [];
+  });
+  chrome.storage.local.get(['controversialFilter', 'profanityFilter', 'sexualFilter', 'customFilters'], data => {
+    controversialFilter = data.controversialFilter || [];
+    profanityFilter = data.profanityFilter || [];
+    sexualFilter = data.sexualFilter || [];
+    customFilter = data.customFilters || [];
+  });
+}
+
+function saveFilters() {
+  chrome.storage.local.set({
+    controversialFilter,
+    profanityFilter,
+    sexualFilter,
+    customFilters: customFilter
+  });
+}
+
+function createFuseInstance(content) {
+  return new Fuse(Array.from(content), {
+    includeScore: true,
+    threshold: 0.1,
+    distance: "levenshtein"
+  });
+}
+
+function filterContent(filterArray, content, fuseInstance, elementSelectors, containerSelector) {
+  const splitselectedFilter = filterArray.flatMap(filter => filter.split(' '));
+
+  for (const filter of splitselectedFilter) {
+    const results = fuseInstance.search(filter);
+    for (const result of results) {
+      document.querySelectorAll(elementSelectors).forEach(element => {
+        const textContent = element.textContent.toLowerCase();
+        if (textContent.includes(result.item)) {
+          const container = element.closest(containerSelector);
+          if (container && container.style.display !== "none") {
+            container.style = hideStyle;
+          }
+        }
+      });
+    }
+  }
+}
+
+function twitterFilter() {
+  const spanContent = new Set();
+  document.querySelectorAll(SELECTORS.TWITTER.SPAN).forEach(span => {
+    span.textContent.toLowerCase().split(' ').forEach(word => spanContent.add(word));
+  });
+  document.querySelectorAll(SELECTORS.TWITTER.TRENDING_TEXT).forEach(trending => {
+    trending.textContent.toLowerCase().split(' ').forEach(word => spanContent.add(word));
+  });
+
+  const fuse = createFuseInstance(spanContent);
+  filterContent(selectedFilter, spanContent, fuse, SELECTORS.TWITTER.POST, "div[class='css-1dbjc4n r-1igl3o0 r-qklmqi r-1adg3ll r-1ny4l3l']");
+  filterContent(selectedFilter, spanContent, fuse, SELECTORS.TWITTER.COMMENT, "div[class='css-1dbjc4n r-1igl3o0 r-qklmqi r-1adg3ll r-1ny4l3l']");
+  filterContent(selectedFilter, spanContent, fuse, SELECTORS.TWITTER.TRENDING_TEXT, SELECTORS.TWITTER.TRENDING);
+}
+
+function facebookFilter() {
+  const fbTextContent = new Set();
+  document.querySelectorAll(SELECTORS.FACEBOOK.TEXT).forEach(div => {
+    div.textContent.toLowerCase().split(" ").forEach(word => fbTextContent.add(word));
+  });
+
+  const fuse = createFuseInstance(fbTextContent);
+  filterContent(selectedFilter, fbTextContent, fuse, SELECTORS.FACEBOOK.TEXT, SELECTORS.FACEBOOK.POST_CONTAINER);
+  filterContent(selectedFilter, fbTextContent, fuse, SELECTORS.FACEBOOK.TEXT, SELECTORS.FACEBOOK.COMMENT_CONTAINER);
+}
+
+function instagramFilter() {
+  const igTextContent = new Set();
+  document.querySelectorAll(SELECTORS.INSTAGRAM.ELEMENTS).forEach(element => {
+    element.textContent.toLowerCase().split(" ").forEach(word => igTextContent.add(word));
+  });
+
+  const fuse = createFuseInstance(igTextContent);
+  filterContent(selectedFilter, igTextContent, fuse, SELECTORS.INSTAGRAM.CAPTION, "article");
+  filterContent(selectedFilter, igTextContent, fuse, SELECTORS.INSTAGRAM.COMMENT, "ul[class*='_a9ym']");
+  filterContent(selectedFilter, igTextContent, fuse, SELECTORS.INSTAGRAM.POPUP_COMMENT, "div[class*='x9f619 xjbqb8w x78zum5 x168nmei x13lgxp2 x5pf9jr xo71vjh x12nagc x1n2onr6 x1plvlek xryxfnj x1c4vz4f x2lah0s x1q0g3np x6s0dn4 x1oa3qoh x1nhvcw1']");
+}
+
+function redditFilter() {
+  const redditTextContent = new Set();
+  document.querySelectorAll(SELECTORS.REDDIT.TARGET_ELEMENTS).forEach(targetText => {
+    targetText.textContent.toLowerCase().split(" ").forEach(word => redditTextContent.add(word));
+  });
+  document.querySelectorAll(SELECTORS.REDDIT.POST_THREAD).forEach(targetText => {
+    targetText.textContent.toLowerCase().split(" ").forEach(word => redditTextContent.add(word));
+  });
+  document.querySelectorAll(SELECTORS.REDDIT.RIGHT_RAIL).forEach(targetText => {
+    targetText.textContent.toLowerCase().split(" ").forEach(word => redditTextContent.add(word));
+  });
+
+  const fuse = createFuseInstance(redditTextContent);
+  filterContent(selectedFilter, redditTextContent, fuse, SELECTORS.REDDIT.POST_TEXT, "div[class*='_1oQyIsiPHYt6nx7VOmd1sz _1RYN-7H8gYctjOQeL8p2Q7']");
+  filterContent(selectedFilter, redditTextContent, fuse, SELECTORS.REDDIT.CAROUSEL, "div[class='_3GfG_jvS9X-90Q_8zU4uCu _3Y1KnhioRYkYGb93uAKhBZ']");
+  filterContent(selectedFilter, redditTextContent, fuse, SELECTORS.REDDIT.POST_THREAD, "shreddit-comment[class='pt-md px-md xs:px-0']");
+  filterContent(selectedFilter, redditTextContent, fuse, SELECTORS.REDDIT.RIGHT_RAIL, "li");
+}
+
+function blurTextContent() {
+  const htmlTextContent = new Set();
+  document.querySelectorAll(SELECTORS.GENERAL.TEXT_ELEMENTS).forEach(targetText => {
+    targetText.textContent.toLowerCase().split(" ").forEach(word => htmlTextContent.add(word));
+  });
+
+  const fuse = createFuseInstance(htmlTextContent);
+  filterContent(selectedFilter, htmlTextContent, fuse, SELECTORS.GENERAL.TEXT_ELEMENTS, blurStyle);
+}
+
+function removeLabelled() {
+>>>>>>> 505a582 (Refactored js files)
   if (window.location.hostname === 'twitter.com') {
     twitterFilter();
   } else if (window.location.hostname === 'www.facebook.com') {
@@ -394,6 +563,7 @@ function removeLabelled() {
   }
 }
 
+<<<<<<< HEAD
 removeLabelled();
 
 // Check if the filters are already in Chrome storage
@@ -435,25 +605,52 @@ observer.observe(document.body, {
 // Listen for messages from the popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
+=======
+loadFilters();
+loadStoredFilters();
+
+chrome.storage.local.set({ controversialFilter, profanityFilter, sexualFilter }, () => {
+  console.log('Filters saved to Chrome storage');
+});
+
+chrome.storage.local.get('customFilters', data => {
+  customFilter = data.customFilters || [];
+});
+
+const observer = new MutationObserver(removeLabelled);
+observer.observe(document.body, { childList: true, subtree: true });
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+>>>>>>> 505a582 (Refactored js files)
   if (request.appliedFilters && Array.isArray(request.appliedFilters)) {
     selectedFilter = [];
 
     if (request.appliedFilters.includes('controversial')) {
+<<<<<<< HEAD
       // Add controversial filters to the selectedFilter array
+=======
+>>>>>>> 505a582 (Refactored js files)
       selectedFilter.push(...controversialFilter);
     }
 
     if (request.appliedFilters.includes('profanity')) {
+<<<<<<< HEAD
       // Add profanity filters to the selectedFilter array
+=======
+>>>>>>> 505a582 (Refactored js files)
       selectedFilter.push(...profanityFilter);
     }
 
     if (request.appliedFilters.includes('sexual')) {
+<<<<<<< HEAD
       // Add sexual filters to the selectedFilter array
+=======
+>>>>>>> 505a582 (Refactored js files)
       selectedFilter.push(...sexualFilter);
     }
 
     if (request.appliedFilters.includes('custom')) {
+<<<<<<< HEAD
       // Add custom filters to the selectedFilter array
       selectedFilter.push(...customFilter);
     }
@@ -498,3 +695,34 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
+=======
+      selectedFilter.push(...customFilter);
+    }
+
+    chrome.storage.local.set({ selectedFilter });
+    removeLabelled();
+  }
+
+  if (request.type === 'addCustomFilter' && request.customWords && typeof request.customWords === 'string') {
+    const words = request.customWords.split(',').map(word => word.trim());
+    customFilter.push(...words);
+
+    chrome.storage.local.set({ customFilters: customFilter });
+
+    if (appliedFilters.includes('custom')) {
+      selectedFilter.push(...customFilter);
+      removeLabelled();
+    }
+
+    chrome.runtime.sendMessage({ type: 'updateCustomFilters', customFilters: customFilter });
+  }
+
+  if (request.type === 'removeCustomFilter' && Array.isArray(request.customFilters)) {
+    customFilter = request.customFilters;
+
+    chrome.storage.local.set({ customFilters: customFilter });
+  }
+});
+
+removeLabelled();
+>>>>>>> 505a582 (Refactored js files)

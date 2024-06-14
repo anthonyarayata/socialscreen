@@ -2,6 +2,7 @@ import { chrome } from 'webextension-polyfill';
 import './src/contentscript.mjs';
 import './src/popup.mjs';
 
+<<<<<<< HEAD
 // Apply filters when the "Apply Filters" button is clicked
 function applyFilters() {
   // Get the selected filters from the checkboxes and text field 
@@ -34,4 +35,35 @@ async function initializeExtension() {
 }
 
 // Initialize the extension on document load
+=======
+function getFilters() {
+  return {
+    controversial: document.getElementById('controversialFilter').checked,
+    profanity: document.getElementById('profanityFilter').checked,
+    sexual: document.getElementById('sexualFilter').checked,
+    custom: document.getElementById('customFilter').checked,
+    customWords: document.getElementById('customWords').value.split(',')
+  };
+}
+
+function applyFilters() {
+  const filters = getFilters();
+  chrome.runtime.sendMessage({ action: "applyFilters", filters });
+}
+
+function attachEventListeners() {
+  const applyFiltersButton = document.getElementById('applyFiltersButton');
+  if (applyFiltersButton) {
+    applyFiltersButton.addEventListener('click', applyFilters);
+  } else {
+    console.error('Apply Filters button not found');
+  }
+}
+
+async function initializeExtension() {
+  attachEventListeners();
+  applyFilters();
+}
+
+>>>>>>> 505a582 (Refactored js files)
 document.addEventListener('DOMContentLoaded', initializeExtension);
