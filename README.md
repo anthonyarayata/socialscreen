@@ -67,19 +67,6 @@ SocialScreen is easy to use as the UI is pretty self explanatory but we will sti
 9. Removing a custom filter will not bring back the posts removed and you will have to refresh the page to see them again. 
 
 
-## Algorithms Used
-SocialScreen utilizes the following algorithms to provide effective content filtering:
-
-1. **Fuse.js**: The extension employs fuzzy matching and fuzzy search when matching the HTML documents against the filter datasets.
-2. **Chrome API**: SocialScreen uses Chrome API's throughout the entire extension's structure.
-
-SocialScreen have specialized functions for each website that will remove posts, comments, and other website elements:
-* Twitter filter function removes the posts, post comments, trending topics, and users. 
-* Facebook and Instagram filter functions removes the posts, and post comments.
-* Reddit filter function removes the posts from the trending carousel, posts (but only limited to the body of the main thread and not the title), thread replies, and trending.
-* Other websites function will blur out the block of text that includes the filtered word.
-
-
 ## Feedback and Contributions
 SocialScreen aims to be community-based in terms of development, so feel free to send feedback and suggestions 
 
